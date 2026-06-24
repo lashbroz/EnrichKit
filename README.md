@@ -327,11 +327,11 @@ gene_sets <- as_gene_sets(pathway_db)
 sumer_job <- sumer_workflow(
   enrichment = wilcox_res,
   gene_sets = gene_sets,
-  out_prefix = "protein_enrichment",
+  out_prefix = "pathway_enrichment",
   weight_col = "signed.fdr",
   top_num = 100,
-  platform_name = "protein_enrichment",
-  platform_abbr = "protein",
+  platform_name = "pathway_enrichment",
+  platform_abbr = "pathway",
   run = FALSE
 )
 
@@ -342,9 +342,9 @@ sumer_job$config_file
 
 This creates the same style of files used in the existing workflow:
 
-- `protein_enrichment_pathways.gmt`: pathway definitions used by SUMER.
-- `protein_enrichment_data.txt`: two-column pathway/weight file.
-- `protein_enrichment_sumer_config.json`: editable SUMER config.
+- `pathway_enrichment_pathways.gmt`: pathway definitions used by SUMER.
+- `pathway_enrichment_data.txt`: two-column pathway/weight file.
+- `pathway_enrichment_sumer_config.json`: editable SUMER config.
 
 The config is intentionally written as a plain editable file. For multi-platform
 SUMER analyses, add additional entries to the `data` array, each with its own
@@ -356,14 +356,14 @@ The config will look like:
 
 ```json
 {
-  "project": "protein_enrichment_sumer_output",
+  "project": "pathway_enrichment_sumer_output",
   "top_num": 100,
   "data": [
     {
-      "platform_name": "protein_enrichment",
-      "platform_abbr": "protein",
-      "gmt_file": "protein_enrichment_pathways.gmt",
-      "score_file": "protein_enrichment_data.txt"
+      "platform_name": "pathway_enrichment",
+      "platform_abbr": "pathway",
+      "gmt_file": "pathway_enrichment_pathways.gmt",
+      "score_file": "pathway_enrichment_data.txt"
     }
   ]
 }
@@ -381,15 +381,15 @@ Meaning:
 Then run SUMER manually from R, matching the old workflow:
 
 ```r
-sumer("protein_enrichment_sumer_config.json", "protein_enrichment_sumer_output")
+sumer("pathway_enrichment_sumer_config.json", "pathway_enrichment_sumer_output")
 ```
 
 After SUMER finishes, read the module outputs:
 
 ```r
 modules <- read_sumer_modules(
-  edge_file = "protein_enrichment_sumer_output/ap_sumer_edgelist.txt",
-  node_file = "protein_enrichment_sumer_output/ap_sumer_nodelist.txt",
+  edge_file = "pathway_enrichment_sumer_output/ap_sumer_edgelist.txt",
+  node_file = "pathway_enrichment_sumer_output/ap_sumer_nodelist.txt",
   gene_sets = gene_sets,
   enrichment = wilcox_res
 )
@@ -405,10 +405,11 @@ can vary across installations.
 ## Transparent Cascade Consolidation
 
 For publication figures and ordered enrichment tables, EnrichKit also includes a
-transparent cascade threshold method. This is less sophisticated than SUMER, but
-it makes every keep/drop decision auditable: walking down a ranked pathway list,
-a pathway is retained only if it introduces at least a specified number of new
-genes/features beyond the pathways already retained.
+transparent cascade threshold method for tracking gene/feature content through
+the consolidation process. Walking down a ranked pathway list, a pathway is
+retained only if it introduces at least a specified number of new genes/features
+beyond the pathways already retained. The output makes it clear which genes are
+newly contributed, already covered, or lost when redundant pathways are removed.
 
 ```r
 cascade <- cascade_threshold_consolidation(
@@ -424,7 +425,7 @@ plot_cascade_threshold_consolidation(cascade)
 
 Use SUMER when you want network-based module discovery. Use cascade threshold
 consolidation when you need a simple, ordered, publication-facing pathway list
-with transparent gene-content accounting.
+and an auditable record of gene-content retained or lost during consolidation.
 
 ## Development Status
 
