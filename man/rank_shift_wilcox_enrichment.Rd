@@ -50,3 +50,9 @@ separately for enrichment and depletion. This tests whether pathway-member
 ranks remain higher or lower than non-pathway ranks even after imposing a
 rank-shift margin on the non-pathway background.
 }
+\details{
+Use this method as a robustness or stringency analysis when standard Wilcoxon
+enrichment may be too permissive. The result identifies pathways whose
+member scores remain directionally separated from the background after a
+prespecified rank margin has been applied.
+}

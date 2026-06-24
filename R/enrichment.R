@@ -347,6 +347,11 @@ thresholded_wilcox_enrichment <- function(feature_scores,
 #' ranks remain higher or lower than non-pathway ranks even after imposing a
 #' rank-shift margin on the non-pathway background.
 #'
+#' Use this method as a robustness or stringency analysis when standard Wilcoxon
+#' enrichment may be too permissive. The result identifies pathways whose
+#' member scores remain directionally separated from the background after a
+#' prespecified rank margin has been applied.
+#'
 #' @param feature_scores Named numeric vector of feature-level scores.
 #' @param pathway_db An `EnrichKit_pathway_db` object or named list.
 #' @param background Optional analysis-specific background features.

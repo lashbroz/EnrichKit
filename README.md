@@ -276,6 +276,13 @@ shifted upward by `round(n_features * shift_fraction)` before testing whether
 pathway ranks are still greater. For depletion, non-pathway ranks are shifted
 downward before testing whether pathway ranks are still smaller.
 
+Use this method when ordinary Wilcoxon enrichment is too permissive and the
+goal is to identify pathways whose signal remains convincing after imposing a
+prespecified rank margin against the background. It is best treated as a
+robustness or stringency analysis: report the `shift_fraction`, and consider
+checking whether conclusions are stable across nearby values such as `0.10`,
+`0.20`, and `0.30`.
+
 ## Result Columns
 
 Core enrichment outputs include:

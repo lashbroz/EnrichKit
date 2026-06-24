@@ -109,7 +109,8 @@ thresholded_res
 
 The rank-shift Wilcoxon method from Xiaoyu Song converts scores to ranks and
 adds a directional rank margin to the non-pathway background before one-sided
-testing.
+testing. Use it as a robustness or stringency analysis when you want pathway
+signals that remain directionally separated after a prespecified rank margin.
 
 ```{r}
 rank_shift_res <- rank_shift_wilcox_enrichment(
