@@ -309,7 +309,7 @@ primary EnrichKit route for pathway consolidation when the goal is to summarize
 many overlapping enrichment calls into network modules of related pathways.
 SUMER was developed by the Zhang lab and remains an external tool:
 https://github.com/bzhanglab/sumer. EnrichKit does not reimplement SUMER; it
-handles the annoying handoff.
+handles the file preparation and round-trip workflow.
 
 The workflow mirrors the old HOPE/KidsFirst pattern:
 
