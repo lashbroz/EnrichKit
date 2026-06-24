@@ -50,12 +50,10 @@ correction, and no hidden project paths.
 
 **4. Consolidate redundant enrichment results**
 
-- Jaccard-overlap redundancy reduction.
-- Fixed gene-separation redundancy reduction.
-- Cascade threshold pathway consolidation, a transparent CPTAC/CBTN workflow
-  that walks down an ordered pathway list and retains pathways that introduce at
-  least a threshold number of new genes/features.
-- Cascade membership and cascade-threshold visualizations.
+- Redundancy filters based on pathway overlap or fixed gene-separation rules.
+- Transparent cascade consolidation for ordered pathway lists, with membership
+  visualizations showing which genes/features are newly contributed by each
+  retained pathway.
 
 **5. Produce publication-oriented outputs**
 
