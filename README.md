@@ -23,8 +23,8 @@ correction, and no hidden project paths.
 - Matches pathway databases to the interrogated gene/feature universe for a
   given analysis and records an audit table of retained, trimmed, and dropped
   pathways.
-- Supports one database system across protein, phosphosite, RNA, mutation, and
-  other feature spaces.
+- Supports consistent database and background handling across analyses where
+  pathway/gene-set interpretation is appropriate.
 - Facilitates reproducibility and inter-study analytical interoperability by
   making database provenance, background matching, size filters, and pathway
   membership changes explicit.
