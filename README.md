@@ -8,7 +8,7 @@ publication-ready supplementary tables.
 
 The package is designed for reproducible, interoperable cross-study analysis:
 explicit inputs, explicit backgrounds, stable result columns, database-aware FDR
-correction, and no hidden project paths.
+correction, and clear database provenance.
 
 ## What EnrichKit Does
 
