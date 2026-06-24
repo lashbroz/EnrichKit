@@ -361,6 +361,11 @@ This creates the same style of files used in the existing workflow:
 - `pathway_enrichment_data.txt`: two-column pathway/weight file.
 - `pathway_enrichment_sumer_config.json`: editable SUMER config.
 
+For older HOPE/KidsFirst scripts, `get_sumer.data()` is provided as a
+compatibility wrapper around `prepare_sumer_input()`. New code can use the more
+explicit `prepare_sumer_input()` name or the snake-case alias
+`get_sumer_data()`.
+
 The config is intentionally written as a plain editable file. For multi-platform
 SUMER analyses, add additional entries to the `data` array, each with its own
 platform label, GMT file, and score file. See the SUMER GitHub repository for

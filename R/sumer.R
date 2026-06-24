@@ -86,6 +86,46 @@ prepare_sumer_input <- function(enrichment,
   )
 }
 
+#' Compatibility Wrapper for get_sumer.data
+#'
+#' Compatibility wrapper around [prepare_sumer_input()]. This preserves the
+#' older HOPE/KidsFirst-style function name `get_sumer.data()` while routing the
+#' implementation through the explicit EnrichKit SUMER input writer.
+#'
+#' Use this when migrating older analysis scripts that called `get_sumer.data`.
+#' New code can call either `prepare_sumer_input()` or the snake-case alias
+#' `get_sumer_data()`.
+#'
+#' @inheritParams prepare_sumer_input
+#'
+#' @return A list containing written file paths and the filtered SUMER input.
+#' @export
+get_sumer.data <- function(enrichment,
+                           gene_sets,
+                           out_prefix,
+                           pathway_col = "pathway",
+                           weight_col = "weights",
+                           fdr_col = "fdr",
+                           direction_col = "dir",
+                           min_abs_weight = NULL,
+                           deduplicate = TRUE) {
+  prepare_sumer_input(
+    enrichment = enrichment,
+    gene_sets = gene_sets,
+    out_prefix = out_prefix,
+    pathway_col = pathway_col,
+    weight_col = weight_col,
+    fdr_col = fdr_col,
+    direction_col = direction_col,
+    min_abs_weight = min_abs_weight,
+    deduplicate = deduplicate
+  )
+}
+
+#' @rdname get_sumer.data
+#' @export
+get_sumer_data <- get_sumer.data
+
 #' Write a SUMER Configuration Template
 #'
 #' Writes the SUMER configuration style used in the HOPE/CPTAC workflows:

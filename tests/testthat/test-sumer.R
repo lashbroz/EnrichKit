@@ -19,6 +19,25 @@ test_that("prepare_sumer_input writes SUMER input files", {
   expect_lt(out$sumer_data$weights[2], 0)
 })
 
+test_that("get_sumer.data compatibility wrappers write SUMER input files", {
+  gene_sets <- list(PATH_A = c("A", "B", "C"), PATH_B = c("C", "D"))
+  enrichment <- data.frame(
+    pathway = c("PATH_A", "PATH_B"),
+    fdr = c(0.01, 0.2),
+    dir = c(1, -1)
+  )
+
+  old_prefix <- file.path(tempdir(), "old_get_sumer")
+  new_prefix <- file.path(tempdir(), "new_get_sumer")
+  old <- get_sumer.data(enrichment, gene_sets, old_prefix)
+  new <- get_sumer_data(enrichment, gene_sets, new_prefix)
+
+  expect_true(file.exists(old$data_file))
+  expect_true(file.exists(new$data_file))
+  expect_equal(old$sumer_data$pathway, new$sumer_data$pathway)
+  expect_equal(old$sumer_data$weights, new$sumer_data$weights)
+})
+
 test_that("SUMER config template and workflow prepare files", {
   gene_sets <- list(PATH_A = c("A", "B", "C"), PATH_B = c("C", "D"))
   enrichment <- data.frame(pathway = c("PATH_A", "PATH_B"), fdr = c(0.01, 0.2), dir = c(1, -1))
