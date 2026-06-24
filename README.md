@@ -12,56 +12,40 @@ correction, and no hidden project paths.
 
 ## What EnrichKit Does
 
-**1. Prepare standardized pathway databases for consistent use across a study**
+**Prepare pathway databases**
 
-- Builds pathway/gene-set databases from named lists, GMT files, selected MSigDB
-  collections, or KidsFirst defaults.
-- Reports supported MSigDB collection names and expected GMT filenames so users
-  can choose databases explicitly.
-- Combines selected databases while preserving database labels such as KEGG,
-  BIOCARTA, REACTOME, GO, Hallmark, or KidsFirst source labels.
-- Matches pathway databases to the interrogated gene/feature universe for a
-  given analysis and records an audit table of retained, trimmed, and dropped
-  pathways.
-- Supports consistent database and background handling across analyses where
-  pathway/gene-set interpretation is appropriate.
-- Facilitates reproducibility and inter-study analytical interoperability by
-  making database provenance, background matching, size filters, and pathway
-  membership changes explicit.
+- Build gene-set databases from named lists, GMT files, selected MSigDB
+  collections, or the packaged KidsFirst `gosets.all` default.
+- Preserve database/source labels and match every pathway to the interrogated
+  genes for a specific analysis, with an audit trail of retained, trimmed, and
+  dropped sets for cross-referencing analyses performed on different platforms
+  or feature universes.
 
-**2. Implement pathway enrichment methods**
+**Run enrichment analyses**
 
-- Fisher/exact-test enrichment for hit lists, with explicit `greater`, `less`,
-  and `two.sided` alternatives.
-- Wilcoxon pathway enrichment for ranked or scored features.
-- Score-thresholded Wilcoxon enrichment.
-- Rank-shift Wilcoxon enrichment, a method from Xiaoyu Song.
-- Database-wise or global FDR adjustment.
-- Signed `-log10(p)` and signed FDR values for heatmaps, ranking, and SUMER
-  weights.
+- Test hit lists with Fisher/exact tests and ranked or scored features with
+  Wilcoxon-based methods.
+- Support one-sided, two-sided, score-thresholded, and rank-shift Wilcoxon
+  analyses.
+- Apply either database-wise or global FDR correction and return signed
+  statistics for ranking, heatmaps, and SUMER weights.
 
-**3. Interoperate with SUMER for pathway-module summaries**
+**Consolidate pathway results**
 
-- Writes pathway GMT files and pathway-weight files for SUMER.
-- Writes editable `myconfig_*.json`-style SUMER config files.
-- Supports the existing manual workflow: prepare files in R, inspect/reuse the
-  config, run `sumer(config, output_name)`, and read modules back into R.
-- Reads SUMER edge/node outputs into module tables and module summaries.
+- Prepare SUMER GMT, score, and config files; run SUMER when available; and read
+  SUMER modules back into R.
+- Provide transparent redundancy filters and cascade visualizations for tracking
+  which genes/features are retained or lost during pathway consolidation.
+- Keep original pathway names after consolidation through representative-to-all
+  pathway crosswalks, so equivalent pathway signals can still be compared across
+  analyses that used different underlying gene sets.
 
-**4. Consolidate redundant enrichment results**
+**Generate manuscript-ready outputs**
 
-- Redundancy filters based on pathway overlap or fixed gene-separation rules.
-- Transparent cascade consolidation for ordered pathway lists, with membership
-  visualizations showing which genes/features are newly contributed by each
-  retained pathway.
-
-**5. Produce publication-oriented outputs**
-
-- Stable enrichment-result columns for manuscripts and supplements.
-- Supplementary table formatting with pathway labels, database labels, counts,
-  p-values, FDR values, direction/effect, method, and background size.
-- Migration-map documentation for how HOPE/KidsFirst-style utilities map into
-  EnrichKit functions.
+- Produce stable enrichment-result and supplementary-table formats with pathway
+  labels, database labels, counts, p-values, FDR values, effect direction,
+  method metadata, and background size.
+- Document how legacy HOPE/KidsFirst utilities map into EnrichKit functions.
 
 ## Installation
 
@@ -484,6 +468,33 @@ sumer_job <- sumer_workflow(
 
 sumer_job$modules$module_table
 ```
+
+For cross-analysis comparison, keep a pathway-key table in addition to the
+consolidated display table. For example, if a collaborator runs an analysis on a
+subset of samples and you want to ask whether the same pathways appear in your
+protein or RNA analysis, use the original pathway names as stable keys:
+
+```r
+protein_reduced <- reduce_redundant_pathways(protein_res, gene_sets)
+subset_reduced <- reduce_redundant_pathways(collaborator_subset_res, gene_sets)
+
+protein_map <- pathway_consolidation_map(protein_reduced)
+subset_map <- pathway_consolidation_map(subset_reduced)
+
+pathway_keys <- cross_reference_pathways(
+  list(
+    protein = protein_reduced,
+    collaborator_subset = subset_reduced
+  )
+)
+
+pathway_keys$wide
+```
+
+The `wide` table has one row per original pathway key and records whether that
+pathway was present in each analysis, which representative pathway it was
+consolidated under, and the corresponding FDR/direction when available. This is
+the table to merge across platforms or append as a publication audit trail.
 
 ## Transparent Cascade Consolidation
 

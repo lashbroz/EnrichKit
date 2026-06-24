@@ -27,7 +27,9 @@ equal to this cutoff. Use \code{NULL} to disable.}
 }
 \value{
 \code{results} with \code{redundant}, \code{representative_pathway}, and
-\code{redundancy_reason} columns.
+\code{redundancy_reason} columns. All original pathway rows are retained so the
+output can be cross-referenced across analyses run on different platforms
+or interrogated gene sets.
 }
 \description{
 Greedy redundancy reduction. Pathways are visited in result-table order, and

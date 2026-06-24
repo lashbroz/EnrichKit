@@ -156,6 +156,38 @@ test_that("redundancy reduction marks similar lower-ranked pathways", {
   expect_equal(reduced$representative_pathway[reduced$pathway == "B"], "A")
 })
 
+test_that("pathway consolidation maps preserve keys across analyses", {
+  sets <- list(
+    MAPK_MAIN = c("BRAF", "MAP2K1", "MAPK1"),
+    MAPK_VARIANT = c("BRAF", "MAP2K1", "MAPK1", "MAPK3"),
+    MTOR = c("AKT1", "MTOR")
+  )
+  protein <- data.frame(
+    pathway = c("MAPK_MAIN", "MAPK_VARIANT", "MTOR"),
+    p = c(0.001, 0.01, 0.2),
+    fdr = c(0.003, 0.02, 0.2),
+    dir = c(1, 1, -1)
+  )
+  subset <- data.frame(
+    pathway = c("MAPK_VARIANT", "MTOR"),
+    p = c(0.02, 0.04),
+    fdr = c(0.04, 0.08),
+    dir = c(1, -1)
+  )
+
+  protein_reduced <- reduce_redundant_pathways(protein, sets, jaccard_cutoff = 0.7)
+  subset_reduced <- reduce_redundant_pathways(subset, sets, jaccard_cutoff = 0.7)
+  map <- pathway_consolidation_map(protein_reduced)
+  keys <- cross_reference_pathways(list(protein = protein_reduced, subset = subset_reduced))
+
+  expect_equal(map$representative_pathway[map$representative_pathway == "MAPK_MAIN"], "MAPK_MAIN")
+  expect_true(grepl("MAPK_VARIANT", map$consolidated_pathways[map$representative_pathway == "MAPK_MAIN"]))
+  expect_true("MAPK_VARIANT" %in% keys$wide$pathway_key)
+  expect_true(keys$wide$protein_present[keys$wide$pathway_key == "MAPK_VARIANT"])
+  expect_true(keys$wide$subset_present[keys$wide$pathway_key == "MAPK_VARIANT"])
+  expect_equal(keys$wide$protein_representative[keys$wide$pathway_key == "MAPK_VARIANT"], "MAPK_MAIN")
+})
+
 test_that("cascade membership data tracks pathway members", {
   sets <- list(A = c("G1", "G2"), B = c("G2", "G3"))
   out <- cascade_membership_data(sets, pathways = c("A", "B"), members = c("G1", "G2", "G3"))
