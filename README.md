@@ -161,7 +161,25 @@ msigdb_db <- build_msigdb_pathway_db(
 )
 ```
 
-The KidsFirst default can either load the already-built GMT:
+EnrichKit ships the current KidsFirst `gosets.all` database as package data:
+
+```r
+data("kfirst_gosets_all")
+data("kfirst_gosets_source")
+
+length(kfirst_gosets_all)
+table(kfirst_gosets_source$source)
+```
+
+For most analyses, use the accessor:
+
+```r
+gosets <- get_kfirst_gosets()
+
+pathway_db <- get_kfirst_gosets(as_pathway_db = TRUE)
+```
+
+The KidsFirst default can also load an external already-built GMT:
 
 ```r
 kfirst_gosets_provenance()
@@ -192,9 +210,7 @@ For methods sections or audit trails, `kfirst_gosets_provenance()` returns a
 citation-ready provenance statement, the component table, and the size filters:
 
 ```r
-prov <- kfirst_gosets_provenance(
-  source_table = "path/to/gosets_all_kfirst_source.tsv"
-)
+prov <- kfirst_gosets_provenance()
 
 cat(prov$text)
 prov$components
@@ -210,6 +226,11 @@ kfirst_db <- build_kfirst_default_pathway_db(
   universe = interrogated_genes
 )
 ```
+
+The packaged data objects can also be reproduced with
+`data-raw/create_kfirst_gosets_all.R`, which expects the HOPE pathway GMT, the
+canonical MSigDB C2 KEGG GMT, a one-column Kids First gene-universe text file,
+and an output directory.
 
 ## Fisher Enrichment
 

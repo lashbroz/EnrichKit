@@ -115,6 +115,30 @@ test_that("KidsFirst gosets provenance is available", {
   expect_equal(out$filters$value, c(6, 249))
 })
 
+test_that("packaged KidsFirst gosets data are available", {
+  data("kfirst_gosets_all", package = "EnrichKit")
+  data("kfirst_gosets_source", package = "EnrichKit")
+  data("kfirst_gene_universe", package = "EnrichKit")
+
+  expect_equal(length(kfirst_gosets_all), 8969)
+  expect_equal(length(kfirst_gene_universe), 12339)
+  expect_true("KEGG_MAPK_SIGNALING_PATHWAY" %in% names(kfirst_gosets_all))
+  expect_equal(nrow(kfirst_gosets_source), length(kfirst_gosets_all))
+  expect_equal(
+    unname(table(kfirst_gosets_source$source)["HOPE_pathway_database_without_KEGG_MEDICUS"]),
+    8785
+  )
+  expect_equal(
+    unname(table(kfirst_gosets_source$source)["MSigDB_c2_cp_kegg_v7_canonical"]),
+    184
+  )
+
+  gosets <- get_kfirst_gosets()
+  expect_equal(length(gosets), 8969)
+  db <- get_kfirst_gosets(as_pathway_db = TRUE)
+  expect_s3_class(db, "EnrichKit_pathway_db")
+})
+
 test_that("redundancy reduction marks similar lower-ranked pathways", {
   sets <- list(
     A = c("G1", "G2", "G3"),

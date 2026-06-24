@@ -312,6 +312,29 @@ kfirst_pathway_database_components <- function(source_table = NULL) {
     counts$description <- kfirst_source_description(counts$source)
     return(counts[, c("source", "description", "n_pathways")])
   }
+
+  if (exists("kfirst_gosets_source", envir = .GlobalEnv, inherits = FALSE)) {
+    x <- get("kfirst_gosets_source", envir = .GlobalEnv)
+  } else {
+    env <- new.env(parent = emptyenv())
+    loaded <- tryCatch({
+      utils::data("kfirst_gosets_source", package = "EnrichKit", envir = env)
+      TRUE
+    }, error = function(e) FALSE)
+    x <- if (isTRUE(loaded) && exists("kfirst_gosets_source", envir = env)) {
+      get("kfirst_gosets_source", envir = env)
+    } else {
+      NULL
+    }
+  }
+
+  if (!is.null(x)) {
+    counts <- as.data.frame(table(x$source), stringsAsFactors = FALSE)
+    colnames(counts) <- c("source", "n_pathways")
+    counts$description <- kfirst_source_description(counts$source)
+    return(counts[, c("source", "description", "n_pathways")])
+  }
+
   data.frame(
     source = c("HOPE_pathway_database_without_KEGG_MEDICUS", "MSigDB_c2_cp_kegg_v7_canonical"),
     description = c(
