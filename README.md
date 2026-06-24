@@ -40,22 +40,22 @@ correction, and no hidden project paths.
 - Signed `-log10(p)` and signed FDR values for heatmaps, ranking, and SUMER
   weights.
 
-**3. Consolidate redundant enrichment results**
-
-- Jaccard-overlap redundancy reduction.
-- Fixed gene-separation redundancy reduction.
-- Cascade threshold pathway consolidation, a CPTAC/CBTN workflow that walks down
-  an ordered pathway list and retains pathways that introduce at least a
-  threshold number of new genes/features.
-- Cascade membership and cascade-threshold visualizations.
-
-**4. Interoperate with SUMER for pathway-module summaries**
+**3. Interoperate with SUMER for pathway-module summaries**
 
 - Writes pathway GMT files and pathway-weight files for SUMER.
 - Writes editable `myconfig_*.json`-style SUMER config files.
 - Supports the existing manual workflow: prepare files in R, inspect/reuse the
   config, run `sumer(config, output_name)`, and read modules back into R.
 - Reads SUMER edge/node outputs into module tables and module summaries.
+
+**4. Consolidate redundant enrichment results**
+
+- Jaccard-overlap redundancy reduction.
+- Fixed gene-separation redundancy reduction.
+- Cascade threshold pathway consolidation, a transparent CPTAC/CBTN workflow
+  that walks down an ordered pathway list and retains pathways that introduce at
+  least a threshold number of new genes/features.
+- Cascade membership and cascade-threshold visualizations.
 
 **5. Produce publication-oriented outputs**
 
@@ -306,28 +306,12 @@ The `signed.*` columns are signed `-log10(p)` values, using `dir` for the sign.
 ## Pathway Consolidation With SUMER
 
 Enrichment often returns many overlapping pathways: related GO terms, Reactome
-branches, KEGG/BioCarta variants, and near-duplicate signatures. There are two
-consolidation strategies in EnrichKit.
-
-First, the cascade threshold method retains pathways that introduce new genes as
-one scans down an ordered pathway list:
-
-```r
-cascade <- cascade_threshold_consolidation(
-  wilcox_res,
-  gene_sets,
-  min_new_members = 5,
-  row_order = "input"
-)
-
-cascade$results
-plot_cascade_threshold_consolidation(cascade)
-```
-
-Second, SUMER can consolidate a long pathway list into network modules of
-related pathways. SUMER was developed by the Zhang lab and remains an external
-tool: https://github.com/bzhanglab/sumer. EnrichKit does not reimplement SUMER;
-it handles the annoying handoff.
+branches, KEGG/BioCarta variants, and near-duplicate signatures. SUMER is the
+primary EnrichKit route for pathway consolidation when the goal is to summarize
+many overlapping enrichment calls into network modules of related pathways.
+SUMER was developed by the Zhang lab and remains an external tool:
+https://github.com/bzhanglab/sumer. EnrichKit does not reimplement SUMER; it
+handles the annoying handoff.
 
 The workflow mirrors the old HOPE/KidsFirst pattern:
 
@@ -413,6 +397,30 @@ modules$module_summary
 If desired, EnrichKit can call SUMER for you with `run = TRUE`, but the manual
 `sumer(config, output_name)` step is usually clearer because SUMER config details
 can vary across installations.
+
+## Transparent Cascade Consolidation
+
+For publication figures and ordered enrichment tables, EnrichKit also includes a
+transparent cascade threshold method. This is less sophisticated than SUMER, but
+it makes every keep/drop decision auditable: walking down a ranked pathway list,
+a pathway is retained only if it introduces at least a specified number of new
+genes/features beyond the pathways already retained.
+
+```r
+cascade <- cascade_threshold_consolidation(
+  wilcox_res,
+  gene_sets,
+  min_new_members = 5,
+  row_order = "input"
+)
+
+cascade$results
+plot_cascade_threshold_consolidation(cascade)
+```
+
+Use SUMER when you want network-based module discovery. Use cascade threshold
+consolidation when you need a simple, ordered, publication-facing pathway list
+with transparent gene-content accounting.
 
 ## Development Status
 
