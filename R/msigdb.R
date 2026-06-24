@@ -332,6 +332,70 @@ kfirst_source_description <- function(source) {
   out
 }
 
+#' KidsFirst gosets.all Provenance
+#'
+#' Returns a short provenance record for the current KidsFirst `gosets.all`
+#' pathway database convention. This is intended for README text, methods
+#' sections, and audit trails.
+#'
+#' The current convention combines the HOPE pathway database after removing
+#' `KEGG_MEDICUS*` pathways with canonical KEGG pathways from MSigDB C2 canonical
+#' pathways that were not already present. The combined database is then matched
+#' to the KidsFirst/interrogated gene universe using the requested pathway-size
+#' limits.
+#'
+#' @param source_table Optional KidsFirst source TSV with `pathway`, `source`,
+#'   and optionally `n_genes` columns. If supplied, pathway counts by source are
+#'   read from this table.
+#' @param min_size Minimum retained set size used for the KidsFirst default.
+#' @param max_size Maximum retained set size used for the KidsFirst default.
+#'
+#' @return A list with `text`, `components`, `filters`, and `method_note`.
+#' @export
+kfirst_gosets_provenance <- function(source_table = NULL,
+                                     min_size = 6,
+                                     max_size = 249) {
+  components <- kfirst_pathway_database_components(source_table)
+  filters <- data.frame(
+    filter = c("minimum_pathway_size", "maximum_pathway_size"),
+    value = c(min_size, max_size),
+    stringsAsFactors = FALSE
+  )
+
+  count_text <- ""
+  if (!is.null(components$n_pathways) && all(!is.na(components$n_pathways))) {
+    count_bits <- paste0(
+      format(components$n_pathways, big.mark = ",", scientific = FALSE),
+      " ",
+      components$source
+    )
+    count_text <- paste0(" In the supplied source table, this corresponds to ",
+                         paste(count_bits, collapse = " and "), ".")
+  }
+
+  text <- paste0(
+    "`gosets.all` was constructed from the HOPE pathway database after removing ",
+    "`KEGG_MEDICUS*` pathways, supplemented with canonical KEGG pathways from ",
+    "MSigDB C2 canonical pathways that were not already present. The combined ",
+    "pathway database was then filtered to the KidsFirst/interrogated gene ",
+    "universe using pathway-size limits of ", min_size, " to ", max_size,
+    " genes.", count_text
+  )
+
+  method_note <- paste(
+    "Use `build_kfirst_default_pathway_db()` to rebuild this convention from",
+    "source GMT files, or `load_kfirst_gosets_gmt()` to load an already-built",
+    "`gosets_all_kfirst.gmt` file with an optional source table."
+  )
+
+  list(
+    text = text,
+    components = components,
+    filters = filters,
+    method_note = method_note
+  )
+}
+
 #' Download a Gene-Set File
 #'
 #' Small explicit wrapper around [utils::download.file()]. This is useful for

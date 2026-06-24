@@ -94,6 +94,27 @@ test_that("KidsFirst default pathway database removes KEGG_MEDICUS and adds cano
   expect_true("KEGG_MAPK_SIGNALING_PATHWAY" %in% names(sets))
 })
 
+test_that("KidsFirst gosets provenance is available", {
+  source_file <- file.path(tempdir(), "kfirst_source.tsv")
+  utils::write.table(
+    data.frame(
+      pathway = c("HOPE_PATH", "KEGG_MAPK_SIGNALING_PATHWAY"),
+      source = c("HOPE_pathway_database_without_KEGG_MEDICUS", "MSigDB_c2_cp_kegg_v7_canonical"),
+      stringsAsFactors = FALSE
+    ),
+    source_file,
+    sep = "\t",
+    row.names = FALSE,
+    quote = FALSE
+  )
+
+  out <- kfirst_gosets_provenance(source_file)
+  expect_true(grepl("KEGG_MEDICUS", out$text))
+  expect_true(grepl("MSigDB C2 canonical", out$text))
+  expect_equal(nrow(out$components), 2)
+  expect_equal(out$filters$value, c(6, 249))
+})
+
 test_that("redundancy reduction marks similar lower-ranked pathways", {
   sets <- list(
     A = c("G1", "G2", "G3"),

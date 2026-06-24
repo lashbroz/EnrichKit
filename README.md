@@ -164,6 +164,8 @@ msigdb_db <- build_msigdb_pathway_db(
 The KidsFirst default can either load the already-built GMT:
 
 ```r
+kfirst_gosets_provenance()
+
 kfirst_pathway_database_components(
   "path/to/gosets_all_kfirst_source.tsv"
 )
@@ -185,6 +187,19 @@ The current KidsFirst default is built from:
 
 With the current source table this corresponds to 8,785 HOPE-derived pathways
 and 184 canonical MSigDB KEGG pathways after KidsFirst filtering.
+
+For methods sections or audit trails, `kfirst_gosets_provenance()` returns a
+citation-ready provenance statement, the component table, and the size filters:
+
+```r
+prov <- kfirst_gosets_provenance(
+  source_table = "path/to/gosets_all_kfirst_source.tsv"
+)
+
+cat(prov$text)
+prov$components
+prov$filters
+```
 
 or rebuild the current KidsFirst convention from source GMTs:
 
