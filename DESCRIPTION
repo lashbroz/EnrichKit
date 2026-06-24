@@ -1,0 +1,26 @@
+Package: EnrichKit
+Title: Enrichment and Pathway Utilities for Proteogenomic Workflows
+Version: 0.0.0.9000
+Authors@R:
+    person("Brian", "Lash", email = "lashbn01@example.com", role = c("aut", "cre"))
+Author: Brian Lash [aut, cre]
+Maintainer: Brian Lash <lashbn01@example.com>
+Description: Utilities for pathway database construction, background matching,
+    enrichment testing, SUMER interoperability, redundancy reduction, and
+    publication-ready supplementary table generation in proteogenomic studies.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.1)
+Imports:
+    stats,
+    utils
+Suggests:
+    igraph,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr

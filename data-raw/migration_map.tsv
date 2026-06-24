@@ -1,0 +1,23 @@
+workflow_area	source_pattern_or_old_artifact	enrichkit_function	status	notes
+gene_set_database_construction	gosets.all/custom named gene-set lists	make_pathway_db	implemented	Wraps named lists with database/source/version metadata.
+gmt_import	Broad/MSigDB GMT files	read_gmt; make_pathway_db_from_gmt	implemented	Reads standard GMT and builds EnrichKit pathway databases.
+msigdb_metadata	Broad/MSigDB collection selection	msigdb_collections	implemented	Metadata helper; explicit download URL still user-supplied.
+msigdb_selected_database	build user-selected MSigDB database from downloaded GMT files	build_msigdb_pathway_db; msigdb_expected_files	implemented	User selects collections and supplies named local files.
+kfirst_default_database	current KidsFirst gosets.all construction	build_kfirst_default_pathway_db; load_kfirst_gosets_gmt	implemented	Supports HOPE database without KEGG_MEDICUS plus canonical MSigDB KEGG, or loading the prebuilt KidsFirst GMT.
+background_matching	analysis-specific measured feature backgrounds	match_pathway_background	implemented	Drops or filters pathway members outside the measured universe.
+gene_counts	consistent pathway counts across output tables	pathway_gene_counts	implemented	Reports set size and optional background-matched count.
+fisher_enrichment	mutation/hit-list exact-test enrichment	fisher_enrichment; calc_ora	implemented	Supports greater/less/two.sided alternatives.
+wilcoxon_enrichment	ranked feature/pathway enrichment	wilcox_enrichment	implemented	Supports greater/less/two.sided alternatives.
+thresholded_wilcoxon	score-thresholded Wilcoxon enrichment	thresholded_wilcox_enrichment	implemented	Restricts background to abs(score) >= threshold before Wilcoxon testing.
+rank_shift_wilcoxon	rank-shift/margin Wilcoxon method from Xiaoyu Song	rank_shift_wilcox_enrichment	implemented	Converts scores to ranks and shifts non-pathway ranks by a fraction of the universe before one-sided tests.
+database_specific_fdr	database-wise p.adjust workflow	adjust_fdr_by_database	implemented	Default in Fisher/Wilcoxon wrappers.
+signed_pvalues	signed -log10 p-value tracks	signed_log10_p	implemented	Used for plotting and SUMER weights.
+redundancy_reduction	overlapping pathway consolidation	reduce_redundant_pathways; consolidate_pathways_by_gene_separation	implemented	Greedy table-order preserving redundancy annotation.
+pathway_similarity	related pathway comparison	pathway_similarity	implemented	Calculates Jaccard and gene separation.
+cascade_membership_plots	mut/pathway cascade-style membership plots	cascade_membership_data; plot_cascade_membership	implemented	Base-R plotting plus reusable long-format table.
+cascade_threshold_consolidation	threshold-based pathway cascade consolidation	cascade_threshold_consolidation; plot_cascade_threshold_consolidation	implemented	Retains pathways that introduce at least a threshold number of new genes/features along an ordered pathway cascade.
+sumer_input	get_sumer.data-style SUMER handoff	prepare_sumer_input	implemented	Writes GMT and pathway/weight files.
+sumer_run	SUMER external execution	run_sumer; prepare_run_read_sumer	implemented	Optional wrapper; SUMER remains external.
+sumer_module_extraction	ap_sumer_nodelist/edgelist module parsing	read_sumer_modules	implemented	Returns module_table and module_summary.
+supplementary_tables	manuscript supplementary enrichment tables	format_enrichment_supplement; write_enrichment_supplement	implemented	Stable columns for publication tables.
+full_publication_workflow	end-to-end workflow documentation	vignettes/enrichment-workflow.Rmd	implemented	Minimal toy workflow vignette.

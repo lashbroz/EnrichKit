@@ -1,0 +1,204 @@
+---
+title: "EnrichKit enrichment workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{EnrichKit enrichment workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(EnrichKit)
+```
+
+## Build a pathway database
+
+```{r}
+gene_sets <- list(
+  KEGG_MAPK_SIGNALING_PATHWAY = c("BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3"),
+  BIOCARTA_MTOR_PATHWAY = c("PIK3CA", "AKT1", "MTOR"),
+  REACTOME_CELL_CYCLE_CHECKPOINTS = c("CDK1", "CDK2", "RB1")
+)
+
+pathway_db <- make_pathway_db(
+  gene_sets,
+  database = c(
+    KEGG_MAPK_SIGNALING_PATHWAY = "KEGG",
+    BIOCARTA_MTOR_PATHWAY = "BIOCARTA",
+    REACTOME_CELL_CYCLE_CHECKPOINTS = "REACTOME"
+  ),
+  source = "example_pathway_database",
+  min_size = 2
+)
+```
+
+## Match to an analysis background
+
+The background should be the interrogated feature universe for the analysis.
+
+```{r}
+interrogated_genes <- c("BRAF", "MAP2K1", "MAPK1", "MAPK3", "AKT1", "MTOR", "TP53", "CDK1")
+matched_db <- match_pathway_background(pathway_db, interrogated_genes, min_size = 2)
+pathway_gene_counts(matched_db)
+pathway_matching_summary(matched_db)
+```
+
+## Fisher enrichment
+
+```{r}
+hits <- c("BRAF", "MAP2K1", "MAPK1")
+
+fisher_res <- fisher_enrichment(
+  hits = hits,
+  pathway_db = matched_db,
+  background = interrogated_genes,
+  alternative = "greater"
+)
+
+fisher_res
+```
+
+FDR is database-wise by default. Use `fdr_by_database = FALSE` for a global
+adjustment.
+
+## Wilcoxon enrichment
+
+```{r}
+scores <- c(
+  BRAF = 2.4,
+  MAP2K1 = 1.7,
+  MAPK1 = 1.3,
+  MAPK3 = 1.1,
+  AKT1 = -0.3,
+  MTOR = -0.8,
+  TP53 = 0.2,
+  CDK1 = -1.2
+)
+
+wilcox_res <- wilcox_enrichment(
+  feature_scores = scores,
+  pathway_db = matched_db,
+  background = interrogated_genes,
+  alternative = "greater"
+)
+
+wilcox_res
+```
+
+## Thresholded Wilcoxon enrichment
+
+Score-thresholded Wilcoxon enrichment first
+restricts the scored background to features above an absolute score threshold.
+
+```{r}
+thresholded_res <- thresholded_wilcox_enrichment(
+  feature_scores = scores,
+  pathway_db = matched_db,
+  threshold = 1,
+  alternative = "greater"
+)
+
+thresholded_res
+```
+
+## Rank-shift Wilcoxon enrichment
+
+The rank-shift Wilcoxon method from Xiaoyu Song converts scores to ranks and
+adds a directional rank margin to the non-pathway background before one-sided
+testing.
+
+```{r}
+rank_shift_res <- rank_shift_wilcox_enrichment(
+  feature_scores = scores,
+  pathway_db = matched_db,
+  background = interrogated_genes,
+  shift_fraction = 0.20,
+  direction = "both"
+)
+
+rank_shift_res
+```
+
+## Redundancy reduction
+
+```{r}
+reduced <- reduce_redundant_pathways(
+  wilcox_res,
+  as_gene_sets(matched_db),
+  jaccard_cutoff = 0.8
+)
+
+reduced[, c("pathway", "fdr", "redundant", "representative_pathway")]
+```
+
+## SUMER handoff
+
+Pathway lists are often redundant. EnrichKit includes cascade-threshold
+consolidation directly, and it also prepares files for SUMER, an external
+pathway-module consolidation package from the Zhang lab:
+https://github.com/bzhanglab/sumer.
+
+```{r}
+cascade <- cascade_threshold_consolidation(
+  wilcox_res,
+  as_gene_sets(matched_db),
+  min_new_members = 2,
+  row_order = "input"
+)
+
+cascade$results[, c("pathway", "cascade_n_new_members", "cascade_retained")]
+```
+
+For SUMER, EnrichKit prepares the input files, writes an editable config
+template, can call SUMER when `run = TRUE`, and reads module output after SUMER
+has run.
+
+```{r eval = FALSE}
+sumer_job <- sumer_workflow(
+  enrichment = wilcox_res,
+  gene_sets = as_gene_sets(matched_db),
+  out_prefix = "pathway_enrichment_sumer",
+  weight_col = "signed.fdr",
+  top_num = 100,
+  platform_name = "pathway_enrichment",
+  platform_abbr = "pathway",
+  run = FALSE
+)
+
+sumer_job$prep$gmt_file
+sumer_job$prep$data_file
+sumer_job$config_file
+```
+
+The files are:
+
+- `*_pathways.gmt`: pathway definitions.
+- `*_data.txt`: pathway weights.
+- `*_sumer_config.json`: editable SUMER config template.
+
+After editing the config for the local SUMER installation:
+
+```{r eval = FALSE}
+sumer_job <- sumer_workflow(
+  enrichment = wilcox_res,
+  gene_sets = as_gene_sets(matched_db),
+  out_prefix = "pathway_enrichment_sumer",
+  weight_col = "signed.fdr",
+  config_file = "pathway_enrichment_sumer_sumer_config.json",
+  output_name = "pathway_enrichment_sumer_output",
+  run = TRUE
+)
+
+sumer_job$modules$module_summary
+```
+
+## Supplementary table
+
+```{r}
+supp <- format_enrichment_supplement(wilcox_res, analysis_name = "MAPK pathway example")
+supp
+```

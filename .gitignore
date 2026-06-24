@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.tar.gz
+Francesca/
+sumer_bridge_workspace/
+standalone_sumer_bridge.R
