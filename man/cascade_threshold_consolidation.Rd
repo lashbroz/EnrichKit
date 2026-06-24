@@ -34,7 +34,7 @@ A list with \code{results}, \code{membership_matrix}, and \code{retained_pathway
 }
 \description{
 Consolidates an ordered pathway result table using a cascade threshold rule
-developed in the CPTAC/CBTN workflow. Pathways are converted to a binary
+developed in the CPTAC/Kids First workflow. Pathways are converted to a binary
 pathway-by-member matrix, columns are cascade-ordered by shared membership,
 and pathways are walked in priority order. The first pathway is retained;
 later pathways are retained only if they introduce at least

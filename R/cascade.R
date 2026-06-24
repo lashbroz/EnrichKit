@@ -87,7 +87,7 @@ plot_cascade_membership <- function(cascade_data,
 #' Cascade Threshold Pathway Consolidation
 #'
 #' Consolidates an ordered pathway result table using a cascade threshold rule
-#' developed in the CPTAC/CBTN workflow. Pathways are converted to a binary
+#' developed in the CPTAC/Kids First workflow. Pathways are converted to a binary
 #' pathway-by-member matrix, columns are cascade-ordered by shared membership,
 #' and pathways are walked in priority order. The first pathway is retained;
 #' later pathways are retained only if they introduce at least

@@ -1,7 +1,7 @@
 # EnrichKit
 
 `EnrichKit` is an R package for standardized pathway and enrichment analysis
-across CPTAC/CBTN-style proteogenomic projects. The goal is to use one explicit,
+across CPTAC/Kids First-style proteogenomic projects. The goal is to use one explicit,
 auditable system for pathway database construction, background matching,
 enrichment testing, pathway consolidation, SUMER interoperability, and
 publication-ready supplementary tables.
