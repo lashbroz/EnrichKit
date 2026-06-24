@@ -346,6 +346,12 @@ This creates the same style of files used in the existing workflow:
 - `protein_enrichment_data.txt`: two-column pathway/weight file.
 - `protein_enrichment_sumer_config.json`: editable SUMER config.
 
+The config is intentionally written as a plain editable file. For multi-platform
+SUMER analyses, add additional entries to the `data` array, each with its own
+platform label, GMT file, and score file. See the SUMER GitHub repository for
+the full expected config structure and options:
+https://github.com/bzhanglab/sumer.
+
 The config will look like:
 
 ```json
