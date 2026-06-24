@@ -69,7 +69,7 @@ From GitHub:
 
 ```r
 install.packages("devtools")
-devtools::install_github("lashbn01/EnrichKit")
+devtools::install_github("lashbroz/EnrichKit")
 ```
 
 From a local checkout:
@@ -82,6 +82,17 @@ During development, load directly:
 
 ```r
 pkgload::load_all(".")
+```
+
+Optional SUMER support uses the Zhang lab SUMER package. Install it directly
+from GitHub:
+
+```r
+devtools::install_github("bzhanglab/sumer")
+library(sumer)
+
+exists("sumer", mode = "function")
+# TRUE
 ```
 
 ## Core Workflow
@@ -347,6 +358,15 @@ SUMER was developed by the Zhang lab and remains an external tool:
 https://github.com/bzhanglab/sumer. EnrichKit does not reimplement SUMER; it
 handles the file preparation and round-trip workflow.
 
+Install SUMER before running SUMER jobs:
+
+```r
+devtools::install_github("bzhanglab/sumer")
+library(sumer)
+
+stopifnot(exists("sumer", mode = "function"))
+```
+
 The workflow mirrors the old HOPE/KidsFirst pattern:
 
 1. Write the pathway GMT and pathway-weight score file.
@@ -422,6 +442,7 @@ Meaning:
 Then run SUMER manually from R, matching the old workflow:
 
 ```r
+library(sumer)
 sumer("pathway_enrichment_sumer_config.json", "pathway_enrichment_sumer_output")
 ```
 
@@ -442,6 +463,27 @@ modules$module_summary
 If desired, EnrichKit can call SUMER for you with `run = TRUE`, but the manual
 `sumer(config, output_name)` step is usually clearer because SUMER config details
 can vary across installations.
+
+For a fully scripted run:
+
+```r
+library(sumer)
+
+sumer_job <- sumer_workflow(
+  enrichment = wilcox_res,
+  gene_sets = gene_sets,
+  out_prefix = "pathway_enrichment",
+  weight_col = "signed.fdr",
+  top_num = 100,
+  platform_name = "pathway_enrichment",
+  platform_abbr = "pathway",
+  run = TRUE,
+  output_name = "pathway_enrichment_sumer_output",
+  overwrite = TRUE
+)
+
+sumer_job$modules$module_table
+```
 
 ## Transparent Cascade Consolidation
 
