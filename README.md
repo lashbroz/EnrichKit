@@ -141,8 +141,6 @@ The packaged object currently contains:
 For most analyses, use the accessor:
 
 ```r
-gosets <- get_kfirst_gosets()
-
 pathway_db <- get_kfirst_gosets(as_pathway_db = TRUE)
 ```
 
