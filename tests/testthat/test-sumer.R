@@ -19,6 +19,42 @@ test_that("prepare_sumer_input writes SUMER input files", {
   expect_lt(out$sumer_data$weights[2], 0)
 })
 
+test_that("prepare_sumer_input can select pathways for SUMER", {
+  gene_sets <- list(
+    PATH_A = c("A", "B", "C"),
+    PATH_B = c("C", "D"),
+    PATH_C = c("E", "F"),
+    PATH_D = c("G", "H")
+  )
+  enrichment <- data.frame(
+    pathway = c("PATH_A", "PATH_B", "PATH_C", "PATH_D"),
+    fdr = c(0.01, 0.20, 0.03, 0.04),
+    dir = c(1, -1, -1, 1)
+  )
+  prefix <- file.path(tempdir(), "toy_sumer_selected")
+  summary_file <- paste0(prefix, "_selection_summary.tsv")
+
+  out <- prepare_sumer_input(
+    enrichment,
+    gene_sets,
+    prefix,
+    fdr_threshold = 0.05,
+    top_n = 2
+  )
+
+  expect_equal(out$sumer_data$pathway, c("PATH_A", "PATH_C"))
+  expect_true(file.exists(summary_file))
+  expect_equal(out$selection_summary_file, summary_file)
+  summary <- utils::read.table(summary_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+  expect_true("fdr_threshold_0.05" %in% summary$step)
+  expect_true("top_n_2" %in% summary$step)
+  expect_equal(summary$n_pathways[summary$step == "fdr_threshold_0.05"], 3)
+  expect_equal(summary$n_pathways[summary$step == "top_n_2"], 2)
+
+  score_file <- utils::read.table(out$data_file, header = FALSE, sep = "\t", stringsAsFactors = FALSE)
+  expect_equal(ncol(score_file), 2)
+})
+
 test_that("get_sumer.data compatibility wrappers write SUMER input files", {
   gene_sets <- list(PATH_A = c("A", "B", "C"), PATH_B = c("C", "D"))
   enrichment <- data.frame(

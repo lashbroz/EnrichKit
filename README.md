@@ -342,6 +342,80 @@ SUMER was developed by the Zhang lab and remains an external tool:
 https://github.com/bzhanglab/sumer. EnrichKit does not reimplement SUMER; it
 handles the file preparation and round-trip workflow.
 
+### Select pathways before SUMER
+
+Do not assume that every tested pathway should be handed to SUMER. Large pathway
+databases can return thousands of nominal or FDR-significant sets, especially
+for broad proteomic contrasts. Passing all tested pathways to SUMER can make the
+run slow and can obscure the biology with weak, redundant, or effectively
+zero-weight nodes.
+
+`prepare_sumer_input()` and `sumer_workflow()` can do this pathway selection
+directly. Common choices are:
+
+- pathways passing an analysis-defined threshold, such as
+  `fdr_threshold = 0.10`;
+- the top `N` pathways by absolute SUMER weight, such as `top_n = 100`;
+- pathways from a more stringent method, such as
+  `rank_shift_wilcox_enrichment()`;
+- Fisher enrichment results from a high-confidence feature hit list, such as
+  genes/proteins with feature-level `fdr < 0.10`, tested separately for up and
+  down directions.
+
+For example, to hand SUMER only FDR-significant pathways:
+
+```r
+sumer_job <- sumer_workflow(
+  enrichment = wilcox_res,
+  gene_sets = gene_sets,
+  out_prefix = "pathway_enrichment_fdr10",
+  weight_col = "signed.fdr",
+  fdr_threshold = 0.10,
+  top_num = 100,
+  platform_name = "pathway_enrichment_fdr10",
+  platform_abbr = "pathway",
+  run = FALSE
+)
+
+sumer_job$prep$selection_summary
+sumer_job$prep$selection_summary_file
+```
+
+Or, keep only the strongest weighted pathways:
+
+```r
+sumer_job <- sumer_workflow(
+  enrichment = wilcox_res,
+  gene_sets = gene_sets,
+  out_prefix = "pathway_enrichment_top100",
+  weight_col = "signed.fdr",
+  top_n = 100,
+  top_num = 100,
+  platform_name = "pathway_enrichment_top100",
+  platform_abbr = "pathway",
+  run = FALSE
+)
+```
+
+You can combine both arguments. In that case EnrichKit first applies
+`fdr_threshold`, orders the remaining pathways by `abs(weights)`, deduplicates
+pathways if requested, and then applies `top_n`.
+
+Every SUMER input preparation writes a pathway-selection summary TSV by default:
+
+```r
+sumer_job$prep$selection_summary_file
+# "pathway_enrichment_top100_selection_summary.tsv"
+```
+
+The summary records how many pathways remain after each step, including the FDR
+threshold and/or top-N filter. This makes it easy to report exactly how many
+pathways were handed to SUMER.
+
+Treat this filtering as part of the analysis design and report it. SUMER is a
+consolidation step, not a replacement for choosing a defensible enrichment
+threshold or ranking rule.
+
 Install SUMER before running SUMER jobs:
 
 ```r

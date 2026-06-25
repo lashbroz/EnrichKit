@@ -14,6 +14,9 @@ get_sumer.data(
   fdr_col = "fdr",
   direction_col = "dir",
   min_abs_weight = NULL,
+  fdr_threshold = NULL,
+  top_n = NULL,
+  selection_summary_file = paste0(out_prefix, "_selection_summary.tsv"),
   deduplicate = TRUE
 )
 
@@ -26,6 +29,9 @@ get_sumer_data(
   fdr_col = "fdr",
   direction_col = "dir",
   min_abs_weight = NULL,
+  fdr_threshold = NULL,
+  top_n = NULL,
+  selection_summary_file = paste0(out_prefix, "_selection_summary.tsv"),
   deduplicate = TRUE
 )
 }
@@ -46,6 +52,16 @@ get_sumer_data(
 is absent. Values should be signed numeric direction/effect indicators.}
 
 \item{min_abs_weight}{Optional minimum absolute weight to retain.}
+
+\item{fdr_threshold}{Optional FDR threshold to retain pathways before SUMER
+input writing. Requires \code{fdr_col}.}
+
+\item{top_n}{Optional number of strongest pathways to retain after other
+filters. Pathways are ranked by absolute SUMER weight.}
+
+\item{selection_summary_file}{Optional TSV file documenting the number of
+pathways retained at each SUMER-selection step. If \code{NULL}, no summary file
+is written.}
 
 \item{deduplicate}{Keep only the strongest row per pathway.}
 }

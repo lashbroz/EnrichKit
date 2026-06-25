@@ -14,6 +14,13 @@
 #' @param direction_col Direction column used to derive weights when `weight_col`
 #'   is absent. Values should be signed numeric direction/effect indicators.
 #' @param min_abs_weight Optional minimum absolute weight to retain.
+#' @param fdr_threshold Optional FDR threshold to retain pathways before SUMER
+#'   input writing. Requires `fdr_col`.
+#' @param top_n Optional number of strongest pathways to retain after other
+#'   filters. Pathways are ranked by absolute SUMER weight.
+#' @param selection_summary_file Optional TSV file documenting the number of
+#'   pathways retained at each SUMER-selection step. If `NULL`, no summary file
+#'   is written.
 #' @param deduplicate Keep only the strongest row per pathway.
 #'
 #' @return A list containing written file paths and the filtered SUMER input.
@@ -26,6 +33,9 @@ prepare_sumer_input <- function(enrichment,
                                 fdr_col = "fdr",
                                 direction_col = "dir",
                                 min_abs_weight = NULL,
+                                fdr_threshold = NULL,
+                                top_n = NULL,
+                                selection_summary_file = paste0(out_prefix, "_selection_summary.tsv"),
                                 deduplicate = TRUE) {
   if (!is.data.frame(enrichment)) {
     stop("`enrichment` must be a data frame.")
@@ -52,16 +62,64 @@ prepare_sumer_input <- function(enrichment,
     weights = as.numeric(x[[weight_col]]),
     stringsAsFactors = FALSE
   )
+  if (fdr_col %in% colnames(x)) {
+    sumer_data$fdr <- as.numeric(x[[fdr_col]])
+  } else if (!is.null(fdr_threshold)) {
+    stop("`fdr_threshold` requires FDR column `", fdr_col, "`.")
+  }
+
+  selection_steps <- data.frame(
+    step = "input_rows",
+    n_pathways = nrow(sumer_data),
+    stringsAsFactors = FALSE
+  )
+
   sumer_data <- sumer_data[is.finite(sumer_data$weights), , drop = FALSE]
+  selection_steps <- rbind(selection_steps, data.frame(step = "finite_weights", n_pathways = nrow(sumer_data)))
+
   sumer_data <- sumer_data[sumer_data$pathway %in% names(gene_sets), , drop = FALSE]
+  selection_steps <- rbind(selection_steps, data.frame(step = "in_gene_sets", n_pathways = nrow(sumer_data)))
 
   if (!is.null(min_abs_weight)) {
     sumer_data <- sumer_data[abs(sumer_data$weights) >= min_abs_weight, , drop = FALSE]
+    selection_steps <- rbind(selection_steps, data.frame(step = paste0("min_abs_weight_", min_abs_weight), n_pathways = nrow(sumer_data)))
+  }
+
+  if (!is.null(fdr_threshold)) {
+    if (!is.numeric(fdr_threshold) || length(fdr_threshold) != 1 ||
+        !is.finite(fdr_threshold) || fdr_threshold < 0) {
+      stop("`fdr_threshold` must be a single non-negative number.")
+    }
+    sumer_data <- sumer_data[!is.na(sumer_data$fdr) & sumer_data$fdr <= fdr_threshold, , drop = FALSE]
+    selection_steps <- rbind(selection_steps, data.frame(step = paste0("fdr_threshold_", fdr_threshold), n_pathways = nrow(sumer_data)))
   }
 
   sumer_data <- sumer_data[order(abs(sumer_data$weights), decreasing = TRUE), , drop = FALSE]
   if (deduplicate) {
     sumer_data <- sumer_data[match(unique(sumer_data$pathway), sumer_data$pathway), , drop = FALSE]
+    selection_steps <- rbind(selection_steps, data.frame(step = "deduplicated", n_pathways = nrow(sumer_data)))
+  }
+
+  if (!is.null(top_n)) {
+    if (!is.numeric(top_n) || length(top_n) != 1 ||
+        !is.finite(top_n) || top_n < 0) {
+      stop("`top_n` must be a single non-negative number.")
+    }
+    top_n <- as.integer(top_n)
+    sumer_data <- utils::head(sumer_data, top_n)
+    selection_steps <- rbind(selection_steps, data.frame(step = paste0("top_n_", top_n), n_pathways = nrow(sumer_data)))
+  } else {
+    selection_steps <- rbind(selection_steps, data.frame(step = "selected", n_pathways = nrow(sumer_data)))
+  }
+
+  if (!is.null(selection_summary_file)) {
+    utils::write.table(
+      selection_steps,
+      file = selection_summary_file,
+      quote = FALSE,
+      row.names = FALSE,
+      sep = "\t"
+    )
   }
 
   gmt_sets <- gene_sets[sumer_data$pathway]
@@ -70,7 +128,7 @@ prepare_sumer_input <- function(enrichment,
 
   write_gmt(gmt_sets, gmt_file)
   utils::write.table(
-    sumer_data,
+    sumer_data[, c("pathway", "weights"), drop = FALSE],
     file = data_file,
     quote = FALSE,
     row.names = FALSE,
@@ -81,6 +139,8 @@ prepare_sumer_input <- function(enrichment,
   list(
     gmt_file = gmt_file,
     data_file = data_file,
+    selection_summary_file = selection_summary_file,
+    selection_summary = selection_steps,
     sumer_data = sumer_data,
     gene_sets = gmt_sets
   )
@@ -108,6 +168,9 @@ get_sumer.data <- function(enrichment,
                            fdr_col = "fdr",
                            direction_col = "dir",
                            min_abs_weight = NULL,
+                           fdr_threshold = NULL,
+                           top_n = NULL,
+                           selection_summary_file = paste0(out_prefix, "_selection_summary.tsv"),
                            deduplicate = TRUE) {
   prepare_sumer_input(
     enrichment = enrichment,
@@ -118,6 +181,9 @@ get_sumer.data <- function(enrichment,
     fdr_col = fdr_col,
     direction_col = direction_col,
     min_abs_weight = min_abs_weight,
+    fdr_threshold = fdr_threshold,
+    top_n = top_n,
+    selection_summary_file = selection_summary_file,
     deduplicate = deduplicate
   )
 }
@@ -372,6 +438,9 @@ prepare_run_read_sumer <- function(enrichment,
                                    fdr_col = "fdr",
                                    direction_col = "dir",
                                    min_abs_weight = NULL,
+                                   fdr_threshold = NULL,
+                                   top_n = NULL,
+                                   selection_summary_file = paste0(out_prefix, "_selection_summary.tsv"),
                                    deduplicate = TRUE,
                                    sumer_fun = NULL,
                                    expected_output_dir = output_name,
@@ -386,6 +455,9 @@ prepare_run_read_sumer <- function(enrichment,
     fdr_col = fdr_col,
     direction_col = direction_col,
     min_abs_weight = min_abs_weight,
+    fdr_threshold = fdr_threshold,
+    top_n = top_n,
+    selection_summary_file = selection_summary_file,
     deduplicate = deduplicate
   )
 
@@ -448,6 +520,9 @@ sumer_workflow <- function(enrichment,
                            fdr_col = "fdr",
                            direction_col = "dir",
                            min_abs_weight = NULL,
+                           fdr_threshold = NULL,
+                           top_n = NULL,
+                           selection_summary_file = paste0(out_prefix, "_selection_summary.tsv"),
                            deduplicate = TRUE,
                            write_config = TRUE,
                            config_extra = list(),
@@ -468,6 +543,9 @@ sumer_workflow <- function(enrichment,
     fdr_col = fdr_col,
     direction_col = direction_col,
     min_abs_weight = min_abs_weight,
+    fdr_threshold = fdr_threshold,
+    top_n = top_n,
+    selection_summary_file = selection_summary_file,
     deduplicate = deduplicate
   )
 
