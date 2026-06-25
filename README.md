@@ -518,11 +518,6 @@ but most users can treat it as internal unless they are customizing SUMER:
 - `pathway_enrichment_pathways.gmt`: pathway definitions used by SUMER.
 - `pathway_enrichment_data.txt`: two-column pathway/weight file.
 
-For older project scripts, `get_sumer.data()` is provided as a
-compatibility wrapper around `prepare_sumer_input()`. New code can use the more
-explicit `prepare_sumer_input()` name or the snake-case alias
-`get_sumer_data()`.
-
 ### Custom SUMER Configuration
 
 Most single-analysis workflows should not need to edit the SUMER config. Treat
