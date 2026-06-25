@@ -17,11 +17,15 @@ library(EnrichKit)
 
 ## Build a pathway database
 
+Start from a named pathway list: names are pathway identifiers, values are gene
+symbols.
+
 ```{r}
 gene_sets <- list(
-  KEGG_MAPK_SIGNALING_PATHWAY = c("BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3"),
-  BIOCARTA_MTOR_PATHWAY = c("PIK3CA", "AKT1", "MTOR"),
-  REACTOME_CELL_CYCLE_CHECKPOINTS = c("CDK1", "CDK2", "RB1")
+  KEGG_MAPK_SIGNALING_PATHWAY = c("BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3", "RAF1", "KRAS", "NRAS"),
+  BIOCARTA_MTOR_PATHWAY = c("PIK3CA", "PIK3R1", "AKT1", "AKT2", "MTOR", "RPTOR", "RICTOR"),
+  REACTOME_CELL_CYCLE_CHECKPOINTS = c("CDK1", "CDK2", "RB1", "CHEK1", "CHEK2", "CCNB1", "CCNE1")
+  # ...
 )
 
 pathway_db <- make_pathway_db(
@@ -32,7 +36,8 @@ pathway_db <- make_pathway_db(
     REACTOME_CELL_CYCLE_CHECKPOINTS = "REACTOME"
   ),
   source = "example_pathway_database",
-  min_size = 2
+  min_size = 5,
+  max_size = 250
 )
 ```
 
@@ -41,8 +46,12 @@ pathway_db <- make_pathway_db(
 The background should be the interrogated feature universe for the analysis.
 
 ```{r}
-interrogated_genes <- c("BRAF", "MAP2K1", "MAPK1", "MAPK3", "AKT1", "MTOR", "TP53", "CDK1")
-matched_db <- match_pathway_background(pathway_db, interrogated_genes, min_size = 2)
+interrogated_genes <- c(
+  "BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3", "RAF1", "KRAS", "NRAS",
+  "PIK3CA", "PIK3R1", "AKT1", "AKT2", "MTOR", "RPTOR", "RICTOR",
+  "CDK1", "CDK2", "RB1", "CHEK1", "CHEK2", "CCNB1", "CCNE1", "TP53"
+)
+matched_db <- match_pathway_background(pathway_db, interrogated_genes, min_size = 5, max_size = 250)
 pathway_gene_counts(matched_db)
 pathway_matching_summary(matched_db)
 ```

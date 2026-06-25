@@ -81,13 +81,17 @@ exists("sumer", mode = "function")
 
 ## Core Workflow
 
+Start with a named pathway list: names are pathway identifiers, values are gene
+symbols. Small examples should still look like real pathway biology.
+
 ```r
 library(EnrichKit)
 
 gene_sets <- list(
-  KEGG_MAPK_SIGNALING_PATHWAY = c("BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3"),
-  BIOCARTA_MTOR_PATHWAY = c("PIK3CA", "AKT1", "MTOR"),
-  REACTOME_CELL_CYCLE_CHECKPOINTS = c("CDK1", "CDK2", "RB1")
+  KEGG_MAPK_SIGNALING_PATHWAY = c("BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3", "RAF1", "KRAS", "NRAS"),
+  BIOCARTA_MTOR_PATHWAY = c("PIK3CA", "PIK3R1", "AKT1", "AKT2", "MTOR", "RPTOR", "RICTOR"),
+  REACTOME_CELL_CYCLE_CHECKPOINTS = c("CDK1", "CDK2", "RB1", "CHEK1", "CHEK2", "CCNB1", "CCNE1")
+  # ...
 )
 
 pathway_db <- make_pathway_db(
@@ -98,10 +102,15 @@ pathway_db <- make_pathway_db(
     REACTOME_CELL_CYCLE_CHECKPOINTS = "REACTOME"
   ),
   source = "example_pathway_database",
-  min_size = 2
+  min_size = 5,
+  max_size = 250
 )
 
-interrogated_genes <- c("BRAF", "MAP2K1", "MAPK1", "MAPK3", "AKT1", "MTOR", "TP53", "CDK1")
+interrogated_genes <- c(
+  "BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3", "RAF1", "KRAS", "NRAS",
+  "PIK3CA", "PIK3R1", "AKT1", "AKT2", "MTOR", "RPTOR", "RICTOR",
+  "CDK1", "CDK2", "RB1", "CHEK1", "CHEK2", "CCNB1", "CCNE1", "TP53"
+)
 pathway_db <- match_pathway_background(pathway_db, interrogated_genes)
 ```
 
@@ -117,8 +126,8 @@ pathway, and records what happened:
 pathway_db <- match_pathway_background(
   pathway_db,
   interrogated_genes,
-  min_size = 6,
-  max_size = 249,
+  min_size = 5,
+  max_size = 250,
   order_by = "input"
 )
 
