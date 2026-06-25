@@ -403,7 +403,6 @@ sumer_job <- sumer_workflow(
   out_prefix = "pathway_enrichment_fdr10",
   weight_col = "signed.fdr",
   fdr_threshold = 0.10,
-  top_num = 100,
   platform_name = "pathway_enrichment_fdr10",
   platform_abbr = "pathway",
   run = FALSE
@@ -422,16 +421,22 @@ sumer_job <- sumer_workflow(
   out_prefix = "pathway_enrichment_top100",
   weight_col = "signed.fdr",
   top_n = 100,
-  top_num = 100,
   platform_name = "pathway_enrichment_top100",
   platform_abbr = "pathway",
   run = FALSE
 )
 ```
 
-You can combine both arguments. In that case EnrichKit first applies
-`fdr_threshold`, orders the remaining pathways by `abs(weights)`, deduplicates
-pathways if requested, and then applies `top_n`.
+Treat `top_n` and `top_num` as different layers. `top_n` is an EnrichKit
+pre-filter: it controls how many pathways are written into the SUMER input
+files. `top_num` is a SUMER config field: it controls how SUMER uses the already
+written pathway files. In most analyses, make the top-pathway decision once with
+`top_n` or with an FDR threshold, then leave `top_num` at its default unless you
+are intentionally editing the SUMER config.
+
+You can combine `fdr_threshold` and `top_n` when that is the analysis design. In
+that case EnrichKit first applies `fdr_threshold`, orders the remaining pathways
+by `abs(weights)`, deduplicates pathways if requested, and then applies `top_n`.
 
 Every SUMER input preparation writes a pathway-selection summary TSV by default:
 
