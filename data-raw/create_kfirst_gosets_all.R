@@ -8,10 +8,12 @@
 ##   3. Kids First/interrogated gene universe, one gene symbol per line.
 ##
 ## Provenance:
+##   - Source 1: HOPE pathway database GMT.
+##   - Source 2: canonical MSigDB C2 KEGG GMT.
 ##   - Remove KEGG_MEDICUS* pathways from the HOPE pathway database.
 ##   - Add canonical MSigDB C2 KEGG pathways not already present.
 ##   - Intersect each pathway with the Kids First gene universe.
-##   - Retain pathways with 6 to 249 genes.
+##   - Retain pathways with inclusive matched size 6 to 249 genes.
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 4) {
@@ -114,4 +116,3 @@ utils::write.table(
 message("Final filtered gene sets: ", length(kfirst_gosets_all))
 message("Source counts:")
 print(table(kfirst_gosets_source$source))
-

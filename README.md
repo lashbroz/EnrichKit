@@ -166,15 +166,31 @@ msigdb_db <- build_msigdb_pathway_db(
 )
 ```
 
-EnrichKit ships the current KidsFirst `gosets.all` database as package data:
+## Kids First Studywide Pathway Database And Generation
+
+EnrichKit ships the current Kids First studywide `gosets.all` database as
+package data. This is the database used for Kids First pathway enrichment unless
+an analysis explicitly supplies a different pathway database.
 
 ```r
 data("kfirst_gosets_all")
 data("kfirst_gosets_source")
+data("kfirst_gosets_metadata")
+data("kfirst_gene_universe")
 
 length(kfirst_gosets_all)
 table(kfirst_gosets_source$source)
+kfirst_gosets_metadata
 ```
+
+The packaged object currently contains:
+
+- 8,969 total retained pathways.
+- 12,339 genes in the Kids First/interrogated gene universe.
+- 8,785 pathways from `HOPE_pathway_database_without_KEGG_MEDICUS`.
+- 184 pathways from `MSigDB_c2_cp_kegg_v7_canonical`.
+- Inclusive pathway-size filtering of 6 to 249 matched genes for this packaged
+  object.
 
 For most analyses, use the accessor:
 
@@ -200,7 +216,8 @@ kfirst_db <- load_kfirst_gosets_gmt(
 )
 ```
 
-The current KidsFirst default is built from:
+The current Kids First studywide database is built from exactly two source
+databases:
 
 - `HOPE_pathway_database_without_KEGG_MEDICUS`: HOPE pathway database after
   removing `KEGG_MEDICUS*` pathways.
@@ -208,8 +225,47 @@ The current KidsFirst default is built from:
   canonical pathways, added so standard names such as
   `KEGG_MAPK_SIGNALING_PATHWAY` are available.
 
-With the current source table this corresponds to 8,785 HOPE-derived pathways
-and 184 canonical MSigDB KEGG pathways after KidsFirst filtering.
+The packaged data were generated from:
+
+```r
+kfirst_gosets_metadata$raw_sources
+# HOPE_pathway_database: "pathway_database_HOPE.gmt"
+# MSigDB_c2_cp_kegg_v7_canonical: "c2.cp.kegg.v7.0.symbols.gmt"
+```
+
+The generation script is included in the package repository:
+
+```sh
+Rscript data-raw/create_kfirst_gosets_all.R \
+  path/to/pathway_database_HOPE.gmt \
+  path/to/c2.cp.kegg.v7.0.symbols.gmt \
+  path/to/kids_first_gene_universe.txt \
+  data
+```
+
+The script applies the following steps:
+
+```r
+hope_sets <- read_gmt(hope_gmt)
+kegg_sets <- read_gmt(canonical_kegg_gmt)
+kfirst_gene_universe <- sort(unique(readLines(gene_universe_file)))
+
+hope_no_medicus <- hope_sets[!grepl("^KEGG_MEDICUS", names(hope_sets))]
+canonical_to_add <- kegg_sets[!names(kegg_sets) %in% names(hope_no_medicus)]
+combined <- c(hope_no_medicus, canonical_to_add)
+
+kfirst_gosets_all <- filter_gosets(
+  combined,
+  gene_universe = kfirst_gene_universe,
+  min_genes = 6,
+  max_genes = 249
+)
+```
+
+`filter_gosets()` intersects each pathway with the Kids First gene universe and
+retains pathways with inclusive matched size
+`6 <= matched_n_genes <= 249`. The companion `kfirst_gosets_source` table stores
+the final source label and matched gene count for every retained pathway.
 
 For methods sections or audit trails, `kfirst_gosets_provenance()` returns a
 citation-ready provenance statement, the component table, and the size filters:
