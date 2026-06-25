@@ -45,7 +45,7 @@ correction, and clear database provenance.
 - Produce stable enrichment-result and supplementary-table formats with pathway
   labels, database labels, counts, p-values, FDR values, effect direction,
   method metadata, and background size.
-- Document how legacy HOPE/KidsFirst utilities map into EnrichKit functions.
+- Document how legacy project utilities map into EnrichKit functions.
 
 ## Installation
 
@@ -123,21 +123,16 @@ an analysis explicitly supplies a different pathway database.
 
 ```r
 data("kfirst_gosets_all")
-data("kfirst_gosets_source")
-data("kfirst_gosets_metadata")
 data("kfirst_gene_universe")
 
 length(kfirst_gosets_all)
-table(kfirst_gosets_source$source)
-kfirst_gosets_metadata
+length(kfirst_gene_universe)
 ```
 
 The packaged object currently contains:
 
 - 9,776 total retained pathways.
 - 12,339 genes in the Kids First/interrogated gene universe.
-- 9,591 pathways from `HOPE_pathway_database_without_KEGG_MEDICUS`.
-- 185 pathways from `MSigDB_c2_cp_kegg_v7_canonical`.
 - Inclusive pathway-size filtering of 5 to 250 matched genes for this packaged
   object.
 
@@ -149,94 +144,51 @@ gosets <- get_kfirst_gosets()
 pathway_db <- get_kfirst_gosets(as_pathway_db = TRUE)
 ```
 
-To construct the Kids First studywide database from scratch, start from the
-explicit source GMT files and the measured/interrogated gene universe:
+To construct a Kids First studywide database from scratch, start from explicit
+MSigDB GMT files and the measured/interrogated gene universe:
 
 ```r
-kfirst_db <- build_kfirst_default_pathway_db(
-  hope_gmt = "path/to/pathway_database_HOPE.gmt",
-  canonical_kegg_gmt = "path/to/c2.cp.kegg.v7.0.symbols.gmt",
+msigdb_db <- build_msigdb_pathway_db(
+  files = c(
+    H = "path/to/h.all.v2026.1.Hs.symbols.gmt",
+    C2 = "path/to/c2.all.v2026.1.Hs.symbols.gmt",
+    C5 = "path/to/c5.all.v2026.1.Hs.symbols.gmt"
+  ),
+  species = "human",
   universe = interrogated_genes,
   min_size = 5,
   max_size = 250
 )
 ```
 
-The current Kids First studywide database is built from these explicitly chosen
-source databases:
-
-- `HOPE_pathway_database_without_KEGG_MEDICUS`: HOPE pathway database after
-  removing `KEGG_MEDICUS*` pathways.
-- `MSigDB_c2_cp_kegg_v7_canonical`: canonical KEGG pathways from MSigDB C2
-  canonical pathways, added so standard names such as
-  `KEGG_MAPK_SIGNALING_PATHWAY` are available.
-
-The retained HOPE-side pathway families are:
+The recommended MSigDB sources for broad proteogenomic pathway screening are:
 
 - `HALLMARK`
-- `GOBP`
-- `GOMF`
-- `REACTOME`
-- `BIOCARTA`
-- `MITO3`
+- `C2:CP:REACTOME`
+- `C2:CP:BIOCARTA`
+- `C2:CP:KEGG`
+- `C5:GO:BP`
+- `C5:GO:MF`
 
-The HOPE-side `KEGG_MEDICUS*` pathways are deliberately excluded. Canonical KEGG
-is instead supplied from the explicit MSigDB C2 CP KEGG GMT
-(`c2.cp.kegg.v7.0.symbols.gmt`) so pathway names follow the standard MSigDB KEGG
-convention.
-
-The packaged data were generated from:
+The same filtering logic applies to any explicit GMT source:
 
 ```r
-kfirst_gosets_metadata$raw_sources
-# HOPE_pathway_database: "pathway_database_HOPE.gmt"
-# MSigDB_c2_cp_kegg_v7_canonical: "c2.cp.kegg.v7.0.symbols.gmt"
-```
-
-The generation script is included in the package repository:
-
-```sh
-Rscript data-raw/create_kfirst_gosets_all.R \
-  path/to/pathway_database_HOPE.gmt \
-  path/to/c2.cp.kegg.v7.0.symbols.gmt \
-  path/to/kids_first_gene_universe.txt \
-  data
-```
-
-The script applies the following steps:
-
-```r
-hope_sets <- read_gmt(hope_gmt)
-kegg_sets <- read_gmt(canonical_kegg_gmt)
-kfirst_gene_universe <- sort(unique(readLines(gene_universe_file)))
-
-hope_no_medicus <- hope_sets[!grepl("^KEGG_MEDICUS", names(hope_sets))]
-canonical_to_add <- kegg_sets[!names(kegg_sets) %in% names(hope_no_medicus)]
-combined <- c(hope_no_medicus, canonical_to_add)
-
-kfirst_gosets_all <- filter_gosets(
-  combined,
-  gene_universe = kfirst_gene_universe,
-  min_genes = 5,
-  max_genes = 250
+pathway_db <- match_pathway_background(
+  msigdb_db,
+  interrogated_genes,
+  min_size = 5,
+  max_size = 250
 )
 ```
 
-`filter_gosets()` intersects each pathway with the Kids First gene universe and
-retains pathways with inclusive matched size
-`5 <= matched_n_genes <= 250`. The companion `kfirst_gosets_source` table stores
-the final source label and matched gene count for every retained pathway.
+Background matching intersects each pathway with the Kids First gene universe
+and retains pathways with inclusive matched size
+`5 <= matched_n_genes <= 250`.
 
 The KidsFirst default can also load an external already-built GMT when a frozen
 database artifact is the desired input:
 
 ```r
-kfirst_gosets_provenance()
-
-kfirst_pathway_database_components(
-  "path/to/gosets_all_kfirst_source.tsv"
-)
-
 kfirst_db <- load_kfirst_gosets_gmt(
   file = "path/to/gosets_all_kfirst.gmt",
   source_table = "path/to/gosets_all_kfirst_source.tsv",
@@ -244,21 +196,8 @@ kfirst_db <- load_kfirst_gosets_gmt(
 )
 ```
 
-For methods sections or audit trails, `kfirst_gosets_provenance()` returns a
-citation-ready provenance statement, the component table, and the size filters:
-
-```r
-prov <- kfirst_gosets_provenance()
-
-cat(prov$text)
-prov$components
-prov$filters
-```
-
-The packaged data objects can also be reproduced with
-`data-raw/create_kfirst_gosets_all.R`, which expects the HOPE pathway GMT, the
-canonical MSigDB C2 KEGG GMT, a one-column Kids First gene-universe text file,
-and an output directory.
+For reproducible projects, keep the exact GMT files, MSigDB version labels, and
+the one-column measured gene-universe file with the analysis outputs.
 
 ## Core Enrichment Workflow
 
@@ -518,7 +457,7 @@ library(sumer)
 stopifnot(exists("sumer", mode = "function"))
 ```
 
-The workflow mirrors the old HOPE/KidsFirst pattern:
+The workflow mirrors the existing KidsFirst-style pattern:
 
 1. Write the pathway GMT and pathway-weight score file.
 2. Write a `myconfig_*.json` style SUMER config.
@@ -553,7 +492,7 @@ This creates the same style of files used in the existing workflow:
 - `pathway_enrichment_data.txt`: two-column pathway/weight file.
 - `pathway_enrichment_sumer_config.json`: editable SUMER config.
 
-For older HOPE/KidsFirst scripts, `get_sumer.data()` is provided as a
+For older project scripts, `get_sumer.data()` is provided as a
 compatibility wrapper around `prepare_sumer_input()`. New code can use the more
 explicit `prepare_sumer_input()` name or the snake-case alias
 `get_sumer_data()`.
@@ -714,7 +653,7 @@ Implemented:
 
 Still in progress:
 
-- deeper HOPE_AYA script-by-script migration
+- deeper legacy script-by-script migration
 - harmonized gene-set support, pending Weiping's relevant harmonization files
 - polished pkgdown-style reference site
 - broader plot theming for publication figures
