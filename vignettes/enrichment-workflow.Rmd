@@ -44,6 +44,7 @@ pathway_db <- make_pathway_db(
 ## Match to an analysis background
 
 The background should be the interrogated feature universe for the analysis.
+The `min_size` and `max_size` filters are inclusive on the matched pathway size.
 
 ```{r}
 interrogated_genes <- c(

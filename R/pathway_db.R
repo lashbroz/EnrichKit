@@ -6,8 +6,8 @@
 #'
 #' @param gene_sets Named list of character vectors.
 #' @param universe Optional character vector of valid analysis features.
-#' @param min_size Minimum retained set size after universe filtering.
-#' @param max_size Maximum retained set size after universe filtering.
+#' @param min_size Inclusive minimum retained set size after universe filtering.
+#' @param max_size Inclusive maximum retained set size after universe filtering.
 #'
 #' @return A named list of cleaned gene sets.
 #' @export
@@ -15,6 +15,7 @@ clean_gene_sets <- function(gene_sets,
                             universe = NULL,
                             min_size = 1,
                             max_size = Inf) {
+  validate_size_limits(min_size, max_size)
   if (!is.list(gene_sets) || is.null(names(gene_sets))) {
     stop("`gene_sets` must be a named list.")
   }
@@ -58,8 +59,8 @@ clean_gene_sets <- function(gene_sets,
 #' @param version Optional source/database version.
 #' @param universe Optional analysis background. If supplied, set members are
 #'   intersected with the universe and dropped when outside size limits.
-#' @param min_size Minimum retained set size.
-#' @param max_size Maximum retained set size.
+#' @param min_size Inclusive minimum retained set size.
+#' @param max_size Inclusive maximum retained set size.
 #' @param deduplicate_identical If `TRUE`, remove exactly duplicated gene sets,
 #'   retaining the first occurrence.
 #'
@@ -153,7 +154,8 @@ pathway_metadata <- function(pathway_db) {
 #' pathway database with updated gene counts. This matters because a small
 #' interrogated/eligible feature universe can cause many pathways to collapse onto
 #' the same few retained genes. Pathways are trimmed to the background, dropped
-#' if their matched size is outside `min_size`/`max_size`, and the returned
+#' if their matched size is outside the inclusive `min_size`/`max_size` range,
+#' and the returned
 #' object stores a `matching_summary` table so this transformation is auditable.
 #' Members within each pathway are sorted alphabetically by [clean_gene_sets()].
 #' Pathway order is source/input order by default, with optional deterministic
@@ -161,8 +163,8 @@ pathway_metadata <- function(pathway_db) {
 #'
 #' @param pathway_db An `EnrichKit_pathway_db` object or named list.
 #' @param background Character vector of valid analysis features.
-#' @param min_size Minimum retained set size after matching.
-#' @param max_size Maximum retained set size after matching.
+#' @param min_size Inclusive minimum retained set size after matching.
+#' @param max_size Inclusive maximum retained set size after matching.
 #' @param warn If `TRUE`, warn when any pathway loses members.
 #' @param order_by Ordering for retained pathways. `"input"` preserves source
 #'   order; `"pathway"` sorts alphabetically; `"database"` sorts by database
@@ -338,6 +340,21 @@ validate_pathway_db <- function(pathway_db) {
   }
   if (!identical(names(pathway_db$sets), pathway_db$metadata$pathway)) {
     stop("Pathway set names must match metadata$pathway in order.")
+  }
+  invisible(TRUE)
+}
+
+validate_size_limits <- function(min_size, max_size) {
+  if (!is.numeric(min_size) || length(min_size) != 1 ||
+      !is.finite(min_size) || min_size < 0) {
+    stop("`min_size` must be a single non-negative finite number.")
+  }
+  if (!is.numeric(max_size) || length(max_size) != 1 ||
+      is.na(max_size) || max_size < 0) {
+    stop("`max_size` must be a single non-negative number or Inf.")
+  }
+  if (min_size > max_size) {
+    stop("`min_size` must be less than or equal to `max_size`.")
   }
   invisible(TRUE)
 }

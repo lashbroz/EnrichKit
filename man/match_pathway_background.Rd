@@ -18,9 +18,9 @@ match_pathway_background(
 
 \item{background}{Character vector of valid analysis features.}
 
-\item{min_size}{Minimum retained set size after matching.}
+\item{min_size}{Inclusive minimum retained set size after matching.}
 
-\item{max_size}{Maximum retained set size after matching.}
+\item{max_size}{Inclusive maximum retained set size after matching.}
 
 \item{warn}{If \code{TRUE}, warn when any pathway loses members.}
 
@@ -36,7 +36,8 @@ Intersect every pathway with an analysis-specific background and return a new
 pathway database with updated gene counts. This matters because a small
 interrogated/eligible feature universe can cause many pathways to collapse onto
 the same few retained genes. Pathways are trimmed to the background, dropped
-if their matched size is outside \code{min_size}/\code{max_size}, and the returned
+if their matched size is outside the inclusive \code{min_size}/\code{max_size} range,
+and the returned
 object stores a \code{matching_summary} table so this transformation is auditable.
 Members within each pathway are sorted alphabetically by \code{\link[=clean_gene_sets]{clean_gene_sets()}}.
 Pathway order is source/input order by default, with optional deterministic

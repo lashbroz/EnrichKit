@@ -41,6 +41,40 @@ test_that("pathway background matching is auditable and orderable", {
   expect_equal(summary$drop_reason[summary$pathway == "dropped"], "below_min_size")
 })
 
+test_that("pathway size limits are inclusive after matching", {
+  sets <- list(
+    below = c("A", "B", "X"),
+    at_min = c("A", "B", "C", "D", "E"),
+    inside = c("A", "B", "C", "D", "E", "F"),
+    at_max = c("A", "B", "C", "D", "E", "F", "G"),
+    above = c("A", "B", "C", "D", "E", "F", "G", "H")
+  )
+  background <- LETTERS[1:8]
+
+  cleaned <- clean_gene_sets(sets, universe = background, min_size = 5, max_size = 7)
+  expect_equal(names(cleaned), c("at_min", "inside", "at_max"))
+  expect_equal(lengths(cleaned), c(at_min = 5, inside = 6, at_max = 7))
+
+  matched <- match_pathway_background(
+    make_pathway_db(sets, min_size = 1, max_size = Inf),
+    background = background,
+    min_size = 5,
+    max_size = 7,
+    warn = FALSE
+  )
+  expect_equal(names(as_gene_sets(matched)), c("at_min", "inside", "at_max"))
+
+  summary <- pathway_matching_summary(matched)
+  expect_equal(summary$drop_reason[summary$pathway == "below"], "below_min_size")
+  expect_equal(summary$drop_reason[summary$pathway == "above"], "above_max_size")
+})
+
+test_that("invalid pathway size limits fail clearly", {
+  expect_error(clean_gene_sets(list(A = LETTERS[1:5]), min_size = 6, max_size = 5), "less than or equal")
+  expect_error(clean_gene_sets(list(A = LETTERS[1:5]), min_size = -1), "non-negative")
+  expect_error(clean_gene_sets(list(A = LETTERS[1:5]), max_size = NA_real_), "non-negative")
+})
+
 test_that("MSigDB collection metadata is available", {
   out <- msigdb_collections("human")
   expect_true(all(c("collection", "label", "gmt_file") %in% colnames(out)))

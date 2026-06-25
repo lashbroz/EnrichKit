@@ -119,7 +119,8 @@ analyses, interrogated phosphosites for phosphosite analyses, and so on.
 
 `match_pathway_background()` is intentionally explicit because it changes the
 effective pathway database. It intersects each pathway with the interrogated
-background, drops pathways outside the size limits, sorts members within each
+background, drops pathways whose matched gene count falls outside the inclusive
+`min_size <= matched_n_genes <= max_size` range, sorts members within each
 pathway, and records what happened:
 
 ```r
@@ -160,8 +161,8 @@ msigdb_db <- build_msigdb_pathway_db(
   ),
   species = "human",
   universe = interrogated_genes,
-  min_size = 6,
-  max_size = 249
+  min_size = 5,
+  max_size = 250
 )
 ```
 

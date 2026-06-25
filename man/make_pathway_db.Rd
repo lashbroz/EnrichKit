@@ -28,9 +28,9 @@ named character vector with one label per pathway.}
 \item{universe}{Optional analysis background. If supplied, set members are
 intersected with the universe and dropped when outside size limits.}
 
-\item{min_size}{Minimum retained set size.}
+\item{min_size}{Inclusive minimum retained set size.}
 
-\item{max_size}{Maximum retained set size.}
+\item{max_size}{Inclusive maximum retained set size.}
 
 \item{deduplicate_identical}{If \code{TRUE}, remove exactly duplicated gene sets,
 retaining the first occurrence.}

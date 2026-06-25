@@ -11,9 +11,9 @@ clean_gene_sets(gene_sets, universe = NULL, min_size = 1, max_size = Inf)
 
 \item{universe}{Optional character vector of valid analysis features.}
 
-\item{min_size}{Minimum retained set size after universe filtering.}
+\item{min_size}{Inclusive minimum retained set size after universe filtering.}
 
-\item{max_size}{Maximum retained set size after universe filtering.}
+\item{max_size}{Inclusive maximum retained set size after universe filtering.}
 }
 \value{
 A named list of cleaned gene sets.
