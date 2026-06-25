@@ -462,17 +462,20 @@ library(sumer)
 stopifnot(exists("sumer", mode = "function"))
 ```
 
-The workflow mirrors the existing KidsFirst-style pattern:
+The default EnrichKit workflow keeps SUMER file generation and configuration
+under the hood:
 
-1. Write the pathway GMT and pathway-weight score file.
-2. Write a `myconfig_*.json` style SUMER config.
-3. Inspect/edit that config if needed.
-4. Run SUMER manually from R.
+1. Select pathways to pass to SUMER.
+2. Write the pathway and weight files SUMER needs.
+3. Write the SUMER configuration needed for the run.
+4. Optionally run SUMER.
 5. Read the resulting modules back into R.
 
-The default EnrichKit workflow stops before running SUMER:
+For a fully scripted run:
 
 ```r
+library(sumer)
+
 gene_sets <- as_gene_sets(pathway_db)
 
 sumer_job <- sumer_workflow(
@@ -480,68 +483,59 @@ sumer_job <- sumer_workflow(
   gene_sets = gene_sets,
   out_prefix = "pathway_enrichment",
   weight_col = "signed.fdr",
-  top_num = 100,
+  platform_name = "pathway_enrichment",
+  platform_abbr = "pathway",
+  run = TRUE,
+  output_name = "pathway_enrichment_sumer_output",
+  overwrite = TRUE
+)
+
+sumer_job$modules$module_table
+sumer_job$modules$module_summary
+```
+
+If you want to prepare files but run SUMER yourself, set `run = FALSE`:
+
+```r
+sumer_job <- sumer_workflow(
+  enrichment = wilcox_res,
+  gene_sets = gene_sets,
+  out_prefix = "pathway_enrichment",
+  weight_col = "signed.fdr",
   platform_name = "pathway_enrichment",
   platform_abbr = "pathway",
   run = FALSE
 )
 
+sumer_job$prep$selection_summary
 sumer_job$prep$gmt_file
 sumer_job$prep$data_file
-sumer_job$config_file
 ```
 
-This creates the same style of files used in the existing workflow:
+EnrichKit writes the files SUMER needs. The configuration file is also written,
+but most users can treat it as internal unless they are customizing SUMER:
 
 - `pathway_enrichment_pathways.gmt`: pathway definitions used by SUMER.
 - `pathway_enrichment_data.txt`: two-column pathway/weight file.
-- `pathway_enrichment_sumer_config.json`: editable SUMER config.
 
 For older project scripts, `get_sumer.data()` is provided as a
 compatibility wrapper around `prepare_sumer_input()`. New code can use the more
 explicit `prepare_sumer_input()` name or the snake-case alias
 `get_sumer_data()`.
 
-The config is intentionally written as a plain editable file. For multi-platform
-SUMER analyses, add additional entries to the `data` array, each with its own
-platform label, GMT file, and score file. See the SUMER GitHub repository for
-the full expected config structure and options:
+### Custom SUMER Configuration
+
+Most single-analysis workflows should not need to edit the SUMER config. Treat
+the JSON file as an implementation detail unless you are deliberately using
+custom SUMER options.
+
+SUMER can support multiple platforms, but that is not EnrichKit's native default
+setup. For multi-platform SUMER analyses, provide a custom SUMER configuration
+with one data entry per platform, each with its own platform label, GMT file, and
+score file. See the SUMER repository for the full expected config structure:
 https://github.com/bzhanglab/sumer.
 
-The config will look like:
-
-```json
-{
-  "project": "pathway_enrichment_sumer_output",
-  "top_num": 100,
-  "data": [
-    {
-      "platform_name": "pathway_enrichment",
-      "platform_abbr": "pathway",
-      "gmt_file": "pathway_enrichment_pathways.gmt",
-      "score_file": "pathway_enrichment_data.txt"
-    }
-  ]
-}
-```
-
-Meaning:
-
-- `project`: SUMER project/output label.
-- `top_num`: number of top weighted pathways SUMER should use.
-- `platform_name`: readable name for the analysis.
-- `platform_abbr`: short prefix used in SUMER node labels.
-- `gmt_file`: pathway membership file.
-- `score_file`: pathway score/weight file.
-
-Then run SUMER manually from R, matching the old workflow:
-
-```r
-library(sumer)
-sumer("pathway_enrichment_sumer_config.json", "pathway_enrichment_sumer_output")
-```
-
-After SUMER finishes, read the module outputs:
+If SUMER was run outside EnrichKit, read module outputs explicitly:
 
 ```r
 modules <- read_sumer_modules(
@@ -553,31 +547,6 @@ modules <- read_sumer_modules(
 
 modules$module_table
 modules$module_summary
-```
-
-If desired, EnrichKit can call SUMER for you with `run = TRUE`, but the manual
-`sumer(config, output_name)` step is usually clearer because SUMER config details
-can vary across installations.
-
-For a fully scripted run:
-
-```r
-library(sumer)
-
-sumer_job <- sumer_workflow(
-  enrichment = wilcox_res,
-  gene_sets = gene_sets,
-  out_prefix = "pathway_enrichment",
-  weight_col = "signed.fdr",
-  top_num = 100,
-  platform_name = "pathway_enrichment",
-  platform_abbr = "pathway",
-  run = TRUE,
-  output_name = "pathway_enrichment_sumer_output",
-  overwrite = TRUE
-)
-
-sumer_job$modules$module_table
 ```
 
 For cross-analysis comparison, keep a pathway-key table in addition to the
