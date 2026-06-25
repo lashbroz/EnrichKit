@@ -79,68 +79,17 @@ exists("sumer", mode = "function")
 # TRUE
 ```
 
-## Core Workflow
-
-Start with a named pathway list: names are pathway identifiers, values are gene
-symbols. Small examples should still look like real pathway biology.
+## Pathway Database Generation
 
 ```r
 library(EnrichKit)
-
-gene_sets <- list(
-  KEGG_MAPK_SIGNALING_PATHWAY = c("BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3", "RAF1", "KRAS", "NRAS"),
-  BIOCARTA_MTOR_PATHWAY = c("PIK3CA", "PIK3R1", "AKT1", "AKT2", "MTOR", "RPTOR", "RICTOR"),
-  REACTOME_CELL_CYCLE_CHECKPOINTS = c("CDK1", "CDK2", "RB1", "CHEK1", "CHEK2", "CCNB1", "CCNE1")
-  # ...
-)
-
-pathway_db <- make_pathway_db(
-  gene_sets,
-  database = c(
-    KEGG_MAPK_SIGNALING_PATHWAY = "KEGG",
-    BIOCARTA_MTOR_PATHWAY = "BIOCARTA",
-    REACTOME_CELL_CYCLE_CHECKPOINTS = "REACTOME"
-  ),
-  source = "example_pathway_database",
-  min_size = 5,
-  max_size = 250
-)
-
-interrogated_genes <- c(
-  "BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3", "RAF1", "KRAS", "NRAS",
-  "PIK3CA", "PIK3R1", "AKT1", "AKT2", "MTOR", "RPTOR", "RICTOR",
-  "CDK1", "CDK2", "RB1", "CHEK1", "CHEK2", "CCNB1", "CCNE1", "TP53"
-)
-pathway_db <- match_pathway_background(pathway_db, interrogated_genes)
 ```
 
-Always use the analysis-specific background: interrogated proteins for protein
-analyses, interrogated phosphosites for phosphosite analyses, and so on.
+The examples below use `interrogated_genes` for the measured assay background.
+Define this from the actual analysis matrix before building or matching pathway
+databases.
 
-`match_pathway_background()` is intentionally explicit because it changes the
-effective pathway database. It intersects each pathway with the interrogated
-background, drops pathways whose matched gene count falls outside the inclusive
-`min_size <= matched_n_genes <= max_size` range, sorts members within each
-pathway, and records what happened:
-
-```r
-pathway_db <- match_pathway_background(
-  pathway_db,
-  interrogated_genes,
-  min_size = 5,
-  max_size = 250,
-  order_by = "input"
-)
-
-pathway_matching_summary(pathway_db)
-```
-
-The default `order_by = "input"` preserves the source database order. Use
-`order_by = "pathway"` for alphabetical order, or `order_by = "database"` to
-group by database label. This is useful when a small interrogated gene universe
-causes many pathways to collapse onto the same few retained genes.
-
-## MSigDB and KidsFirst Defaults
+### MSigDB and KidsFirst Defaults
 
 Use `msigdb_collections()` to see the supported current MSigDB collection menu
 and expected GMT file names:
@@ -166,7 +115,7 @@ msigdb_db <- build_msigdb_pathway_db(
 )
 ```
 
-## Kids First Studywide Pathway Database And Generation
+### Kids First Studywide Pathway Database And Generation
 
 EnrichKit ships the current Kids First studywide `gosets.all` database as
 package data. This is the database used for Kids First pathway enrichment unless
@@ -310,6 +259,66 @@ The packaged data objects can also be reproduced with
 `data-raw/create_kfirst_gosets_all.R`, which expects the HOPE pathway GMT, the
 canonical MSigDB C2 KEGG GMT, a one-column Kids First gene-universe text file,
 and an output directory.
+
+## Core Enrichment Workflow
+
+Once a pathway database has been built or loaded, match it to the
+analysis-specific background before running enrichment: interrogated proteins
+for protein analyses, interrogated phosphosites for phosphosite analyses, and so
+on.
+
+If starting from a small named list, names are pathway identifiers and values are
+gene symbols. Small examples should still look like real pathway biology.
+
+```r
+gene_sets <- list(
+  KEGG_MAPK_SIGNALING_PATHWAY = c("BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3", "RAF1", "KRAS", "NRAS"),
+  BIOCARTA_MTOR_PATHWAY = c("PIK3CA", "PIK3R1", "AKT1", "AKT2", "MTOR", "RPTOR", "RICTOR"),
+  REACTOME_CELL_CYCLE_CHECKPOINTS = c("CDK1", "CDK2", "RB1", "CHEK1", "CHEK2", "CCNB1", "CCNE1")
+  # ...
+)
+
+pathway_db <- make_pathway_db(
+  gene_sets,
+  database = c(
+    KEGG_MAPK_SIGNALING_PATHWAY = "KEGG",
+    BIOCARTA_MTOR_PATHWAY = "BIOCARTA",
+    REACTOME_CELL_CYCLE_CHECKPOINTS = "REACTOME"
+  ),
+  source = "example_pathway_database",
+  min_size = 5,
+  max_size = 250
+)
+
+interrogated_genes <- c(
+  "BRAF", "MAP2K1", "MAP2K2", "MAPK1", "MAPK3", "RAF1", "KRAS", "NRAS",
+  "PIK3CA", "PIK3R1", "AKT1", "AKT2", "MTOR", "RPTOR", "RICTOR",
+  "CDK1", "CDK2", "RB1", "CHEK1", "CHEK2", "CCNB1", "CCNE1", "TP53"
+)
+```
+
+`match_pathway_background()` is intentionally explicit because it changes the
+effective pathway database. It intersects each pathway with the interrogated
+background, drops pathways whose matched gene count falls outside the inclusive
+`min_size <= matched_n_genes <= max_size` range, sorts members within each
+pathway, and records what happened:
+
+```r
+pathway_db <- match_pathway_background(
+  pathway_db,
+  interrogated_genes,
+  min_size = 5,
+  max_size = 250,
+  order_by = "input"
+)
+
+pathway_matching_summary(pathway_db)
+```
+
+The default `order_by = "input"` preserves the source database order. Use
+`order_by = "pathway"` for alphabetical order, or `order_by = "database"` to
+group by database label. This is useful when a small interrogated gene universe
+causes many pathways to collapse onto the same few retained genes.
 
 ## Fisher Enrichment
 
