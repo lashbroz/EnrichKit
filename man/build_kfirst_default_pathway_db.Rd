@@ -13,9 +13,11 @@ build_kfirst_default_pathway_db(
 )
 }
 \arguments{
-\item{hope_gmt}{HOPE pathway database GMT.}
+\item{hope_gmt}{HOPE pathway database GMT, typically
+\code{pathway_database_HOPE.gmt}.}
 
-\item{canonical_kegg_gmt}{Canonical MSigDB KEGG GMT.}
+\item{canonical_kegg_gmt}{Canonical MSigDB C2 CP KEGG GMT, for example
+\code{c2.cp.kegg.v7.0.symbols.gmt}.}
 
 \item{universe}{Measured gene universe used for filtering.}
 
@@ -27,8 +29,9 @@ build_kfirst_default_pathway_db(
 An \code{EnrichKit_pathway_db} object.
 }
 \description{
-Recreates the current KidsFirst pathway-database convention: use the HOPE
-pathway GMT with \verb{KEGG_MEDICUS*} pathways removed, add canonical MSigDB KEGG
-pathways not already present, and filter to the provided KidsFirst/measured
+Recreates the current KidsFirst pathway-database convention from explicit
+source files: use \code{pathway_database_HOPE.gmt} with \verb{KEGG_MEDICUS*} pathways
+removed, add canonical MSigDB C2 CP KEGG pathways from an explicit GMT file
+that are not already present, and filter to the provided KidsFirst/measured
 gene universe.
 }

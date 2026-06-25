@@ -207,13 +207,16 @@ build_msigdb_pathway_db <- function(files,
 
 #' Build the KidsFirst Default Pathway Database
 #'
-#' Recreates the current KidsFirst pathway-database convention: use the HOPE
-#' pathway GMT with `KEGG_MEDICUS*` pathways removed, add canonical MSigDB KEGG
-#' pathways not already present, and filter to the provided KidsFirst/measured
+#' Recreates the current KidsFirst pathway-database convention from explicit
+#' source files: use `pathway_database_HOPE.gmt` with `KEGG_MEDICUS*` pathways
+#' removed, add canonical MSigDB C2 CP KEGG pathways from an explicit GMT file
+#' that are not already present, and filter to the provided KidsFirst/measured
 #' gene universe.
 #'
-#' @param hope_gmt HOPE pathway database GMT.
-#' @param canonical_kegg_gmt Canonical MSigDB KEGG GMT.
+#' @param hope_gmt HOPE pathway database GMT, typically
+#'   `pathway_database_HOPE.gmt`.
+#' @param canonical_kegg_gmt Canonical MSigDB C2 CP KEGG GMT, for example
+#'   `c2.cp.kegg.v7.0.symbols.gmt`.
 #' @param universe Measured gene universe used for filtering.
 #' @param min_size Minimum retained set size. Defaults to KidsFirst usage, 6.
 #' @param max_size Maximum retained set size. Defaults to KidsFirst usage, 249.
@@ -234,7 +237,7 @@ build_kfirst_default_pathway_db <- function(hope_gmt,
 
   database <- c(
     stats::setNames(rep("HOPE_pathway_database_without_KEGG_MEDICUS", length(hope_no_medicus)), names(hope_no_medicus)),
-    stats::setNames(rep("MSigDB_c2_cp_kegg_canonical", length(canonical_to_add)), names(canonical_to_add))
+    stats::setNames(rep("MSigDB_c2_cp_kegg_v7_canonical", length(canonical_to_add)), names(canonical_to_add))
   )
 
   make_pathway_db(

@@ -124,8 +124,13 @@ test_that("KidsFirst default pathway database removes KEGG_MEDICUS and adds cano
   )
 
   sets <- as_gene_sets(db)
+  meta <- pathway_metadata(db)
   expect_false("KEGG_MEDICUS_BAD" %in% names(sets))
   expect_true("KEGG_MAPK_SIGNALING_PATHWAY" %in% names(sets))
+  expect_equal(
+    meta$database[meta$pathway == "KEGG_MAPK_SIGNALING_PATHWAY"],
+    "MSigDB_c2_cp_kegg_v7_canonical"
+  )
 })
 
 test_that("KidsFirst gosets provenance is available", {

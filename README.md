@@ -200,30 +200,41 @@ gosets <- get_kfirst_gosets()
 pathway_db <- get_kfirst_gosets(as_pathway_db = TRUE)
 ```
 
-The KidsFirst default can also load an external already-built GMT:
+To construct the Kids First studywide database from scratch, start from the
+explicit source GMT files and the measured/interrogated gene universe:
 
 ```r
-kfirst_gosets_provenance()
-
-kfirst_pathway_database_components(
-  "path/to/gosets_all_kfirst_source.tsv"
-)
-
-kfirst_db <- load_kfirst_gosets_gmt(
-  file = "path/to/gosets_all_kfirst.gmt",
-  source_table = "path/to/gosets_all_kfirst_source.tsv",
-  universe = interrogated_genes
+kfirst_db <- build_kfirst_default_pathway_db(
+  hope_gmt = "path/to/pathway_database_HOPE.gmt",
+  canonical_kegg_gmt = "path/to/c2.cp.kegg.v7.0.symbols.gmt",
+  universe = interrogated_genes,
+  min_size = 6,
+  max_size = 249
 )
 ```
 
-The current Kids First studywide database is built from exactly two source
-databases:
+The current Kids First studywide database is built from these explicitly chosen
+source databases:
 
 - `HOPE_pathway_database_without_KEGG_MEDICUS`: HOPE pathway database after
   removing `KEGG_MEDICUS*` pathways.
 - `MSigDB_c2_cp_kegg_v7_canonical`: canonical KEGG pathways from MSigDB C2
   canonical pathways, added so standard names such as
   `KEGG_MAPK_SIGNALING_PATHWAY` are available.
+
+The retained HOPE-side pathway families are:
+
+- `HALLMARK`
+- `GOBP`
+- `GOMF`
+- `REACTOME`
+- `BIOCARTA`
+- `MITO3`
+
+The HOPE-side `KEGG_MEDICUS*` pathways are deliberately excluded. Canonical KEGG
+is instead supplied from the explicit MSigDB C2 CP KEGG GMT
+(`c2.cp.kegg.v7.0.symbols.gmt`) so pathway names follow the standard MSigDB KEGG
+convention.
 
 The packaged data were generated from:
 
@@ -267,6 +278,23 @@ retains pathways with inclusive matched size
 `6 <= matched_n_genes <= 249`. The companion `kfirst_gosets_source` table stores
 the final source label and matched gene count for every retained pathway.
 
+The KidsFirst default can also load an external already-built GMT when a frozen
+database artifact is the desired input:
+
+```r
+kfirst_gosets_provenance()
+
+kfirst_pathway_database_components(
+  "path/to/gosets_all_kfirst_source.tsv"
+)
+
+kfirst_db <- load_kfirst_gosets_gmt(
+  file = "path/to/gosets_all_kfirst.gmt",
+  source_table = "path/to/gosets_all_kfirst_source.tsv",
+  universe = interrogated_genes
+)
+```
+
 For methods sections or audit trails, `kfirst_gosets_provenance()` returns a
 citation-ready provenance statement, the component table, and the size filters:
 
@@ -276,16 +304,6 @@ prov <- kfirst_gosets_provenance()
 cat(prov$text)
 prov$components
 prov$filters
-```
-
-or rebuild the current KidsFirst convention from source GMTs:
-
-```r
-kfirst_db <- build_kfirst_default_pathway_db(
-  hope_gmt = "path/to/pathway_database_HOPE.gmt",
-  canonical_kegg_gmt = "path/to/c2.cp.kegg.v7.0.symbols.gmt",
-  universe = interrogated_genes
-)
 ```
 
 The packaged data objects can also be reproduced with
