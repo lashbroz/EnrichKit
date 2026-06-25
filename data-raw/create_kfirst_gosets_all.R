@@ -13,7 +13,7 @@
 ##   - Remove KEGG_MEDICUS* pathways from the HOPE pathway database.
 ##   - Add canonical MSigDB C2 KEGG pathways not already present.
 ##   - Intersect each pathway with the Kids First gene universe.
-##   - Retain pathways with inclusive matched size 6 to 249 genes.
+##   - Retain pathways with inclusive matched size 5 to 250 genes.
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 4) {
@@ -31,8 +31,8 @@ out_dir <- args[[4]]
 
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
-min_genes <- 6
-max_genes <- 249
+min_genes <- 5
+max_genes <- 250
 
 read_gmt <- function(file) {
   lines <- readLines(file, warn = FALSE)

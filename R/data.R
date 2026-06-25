@@ -6,7 +6,7 @@
 #' `KEGG_MEDICUS*` pathways, supplemented with canonical KEGG pathways from
 #' MSigDB C2 canonical pathways that were not already present. The combined
 #' database was then filtered to the Kids First interrogated gene universe using
-#' pathway-size limits of 6 to 249 genes.
+#' pathway-size limits of 5 to 250 genes.
 #'
 #' @format A named list. Each element is a character vector of gene symbols for
 #'   one pathway/gene set.
@@ -39,4 +39,3 @@
 #' @format A list with source labels, pathway-size filters, pathway counts, and
 #'   the size of the Kids First gene universe.
 "kfirst_gosets_metadata"
-

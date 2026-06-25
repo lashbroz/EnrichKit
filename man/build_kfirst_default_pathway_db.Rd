@@ -8,8 +8,8 @@ build_kfirst_default_pathway_db(
   hope_gmt,
   canonical_kegg_gmt,
   universe,
-  min_size = 6,
-  max_size = 249
+  min_size = 5,
+  max_size = 250
 )
 }
 \arguments{
@@ -21,9 +21,9 @@ build_kfirst_default_pathway_db(
 
 \item{universe}{Measured gene universe used for filtering.}
 
-\item{min_size}{Minimum retained set size. Defaults to KidsFirst usage, 6.}
+\item{min_size}{Minimum retained set size. Defaults to KidsFirst usage, 5.}
 
-\item{max_size}{Maximum retained set size. Defaults to KidsFirst usage, 249.}
+\item{max_size}{Maximum retained set size. Defaults to KidsFirst usage, 250.}
 }
 \value{
 An \code{EnrichKit_pathway_db} object.

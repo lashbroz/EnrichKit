@@ -4,7 +4,7 @@
 \alias{kfirst_gosets_provenance}
 \title{KidsFirst gosets.all Provenance}
 \usage{
-kfirst_gosets_provenance(source_table = NULL, min_size = 6, max_size = 249)
+kfirst_gosets_provenance(source_table = NULL, min_size = 5, max_size = 250)
 }
 \arguments{
 \item{source_table}{Optional KidsFirst source TSV with \code{pathway}, \code{source},

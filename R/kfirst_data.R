@@ -15,8 +15,8 @@
 #' @return A named list of gene sets or an `EnrichKit_pathway_db` object.
 #' @export
 get_kfirst_gosets <- function(gene = NULL,
-                              min_genes = 6,
-                              max_genes = 249,
+                              min_genes = 5,
+                              max_genes = 250,
                               deduplicate = FALSE,
                               as_pathway_db = FALSE) {
   data_env <- new.env(parent = emptyenv())

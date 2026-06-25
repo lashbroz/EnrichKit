@@ -218,16 +218,16 @@ build_msigdb_pathway_db <- function(files,
 #' @param canonical_kegg_gmt Canonical MSigDB C2 CP KEGG GMT, for example
 #'   `c2.cp.kegg.v7.0.symbols.gmt`.
 #' @param universe Measured gene universe used for filtering.
-#' @param min_size Minimum retained set size. Defaults to KidsFirst usage, 6.
-#' @param max_size Maximum retained set size. Defaults to KidsFirst usage, 249.
+#' @param min_size Minimum retained set size. Defaults to KidsFirst usage, 5.
+#' @param max_size Maximum retained set size. Defaults to KidsFirst usage, 250.
 #'
 #' @return An `EnrichKit_pathway_db` object.
 #' @export
 build_kfirst_default_pathway_db <- function(hope_gmt,
                                             canonical_kegg_gmt,
                                             universe,
-                                            min_size = 6,
-                                            max_size = 249) {
+                                            min_size = 5,
+                                            max_size = 250) {
   hope_sets <- read_gmt(hope_gmt, min_size = 1, max_size = Inf)
   kegg_sets <- read_gmt(canonical_kegg_gmt, min_size = 1, max_size = Inf)
 
@@ -267,8 +267,8 @@ build_kfirst_default_pathway_db <- function(hope_gmt,
 load_kfirst_gosets_gmt <- function(file,
                                    source_table = NULL,
                                    universe = NULL,
-                                   min_size = 6,
-                                   max_size = 249) {
+                                   min_size = 5,
+                                   max_size = 250) {
   sets <- read_gmt(file, min_size = min_size, max_size = max_size, universe = universe)
   database <- stats::setNames(rep("KidsFirst_gosets_all", length(sets)), names(sets))
   if (!is.null(source_table)) {
@@ -379,8 +379,8 @@ kfirst_source_description <- function(source) {
 #' @return A list with `text`, `components`, `filters`, and `method_note`.
 #' @export
 kfirst_gosets_provenance <- function(source_table = NULL,
-                                     min_size = 6,
-                                     max_size = 249) {
+                                     min_size = 5,
+                                     max_size = 250) {
   components <- kfirst_pathway_database_components(source_table)
   filters <- data.frame(
     filter = c("minimum_pathway_size", "maximum_pathway_size"),

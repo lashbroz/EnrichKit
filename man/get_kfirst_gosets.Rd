@@ -6,8 +6,8 @@
 \usage{
 get_kfirst_gosets(
   gene = NULL,
-  min_genes = 6,
-  max_genes = 249,
+  min_genes = 5,
+  max_genes = 250,
   deduplicate = FALSE,
   as_pathway_db = FALSE
 )

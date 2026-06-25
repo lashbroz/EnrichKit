@@ -120,7 +120,7 @@ test_that("KidsFirst default pathway database removes KEGG_MEDICUS and adds cano
     canonical_kegg_gmt = kegg_file,
     universe = LETTERS[1:10],
     min_size = 2,
-    max_size = 249
+    max_size = 250
   )
 
   sets <- as_gene_sets(db)
@@ -151,7 +151,7 @@ test_that("KidsFirst gosets provenance is available", {
   expect_true(grepl("KEGG_MEDICUS", out$text))
   expect_true(grepl("MSigDB C2 canonical", out$text))
   expect_equal(nrow(out$components), 2)
-  expect_equal(out$filters$value, c(6, 249))
+  expect_equal(out$filters$value, c(5, 250))
 })
 
 test_that("packaged KidsFirst gosets data are available", {
@@ -159,21 +159,21 @@ test_that("packaged KidsFirst gosets data are available", {
   data("kfirst_gosets_source", package = "EnrichKit")
   data("kfirst_gene_universe", package = "EnrichKit")
 
-  expect_equal(length(kfirst_gosets_all), 8969)
+  expect_equal(length(kfirst_gosets_all), 9776)
   expect_equal(length(kfirst_gene_universe), 12339)
   expect_true("KEGG_MAPK_SIGNALING_PATHWAY" %in% names(kfirst_gosets_all))
   expect_equal(nrow(kfirst_gosets_source), length(kfirst_gosets_all))
   expect_equal(
     unname(table(kfirst_gosets_source$source)["HOPE_pathway_database_without_KEGG_MEDICUS"]),
-    8785
+    9591
   )
   expect_equal(
     unname(table(kfirst_gosets_source$source)["MSigDB_c2_cp_kegg_v7_canonical"]),
-    184
+    185
   )
 
   gosets <- get_kfirst_gosets()
-  expect_equal(length(gosets), 8969)
+  expect_equal(length(gosets), 9776)
   db <- get_kfirst_gosets(as_pathway_db = TRUE)
   expect_s3_class(db, "EnrichKit_pathway_db")
 })

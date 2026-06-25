@@ -8,8 +8,8 @@ load_kfirst_gosets_gmt(
   file,
   source_table = NULL,
   universe = NULL,
-  min_size = 6,
-  max_size = 249
+  min_size = 5,
+  max_size = 250
 )
 }
 \arguments{

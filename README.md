@@ -134,11 +134,11 @@ kfirst_gosets_metadata
 
 The packaged object currently contains:
 
-- 8,969 total retained pathways.
+- 9,776 total retained pathways.
 - 12,339 genes in the Kids First/interrogated gene universe.
-- 8,785 pathways from `HOPE_pathway_database_without_KEGG_MEDICUS`.
-- 184 pathways from `MSigDB_c2_cp_kegg_v7_canonical`.
-- Inclusive pathway-size filtering of 6 to 249 matched genes for this packaged
+- 9,591 pathways from `HOPE_pathway_database_without_KEGG_MEDICUS`.
+- 185 pathways from `MSigDB_c2_cp_kegg_v7_canonical`.
+- Inclusive pathway-size filtering of 5 to 250 matched genes for this packaged
   object.
 
 For most analyses, use the accessor:
@@ -157,8 +157,8 @@ kfirst_db <- build_kfirst_default_pathway_db(
   hope_gmt = "path/to/pathway_database_HOPE.gmt",
   canonical_kegg_gmt = "path/to/c2.cp.kegg.v7.0.symbols.gmt",
   universe = interrogated_genes,
-  min_size = 6,
-  max_size = 249
+  min_size = 5,
+  max_size = 250
 )
 ```
 
@@ -217,14 +217,14 @@ combined <- c(hope_no_medicus, canonical_to_add)
 kfirst_gosets_all <- filter_gosets(
   combined,
   gene_universe = kfirst_gene_universe,
-  min_genes = 6,
-  max_genes = 249
+  min_genes = 5,
+  max_genes = 250
 )
 ```
 
 `filter_gosets()` intersects each pathway with the Kids First gene universe and
 retains pathways with inclusive matched size
-`6 <= matched_n_genes <= 249`. The companion `kfirst_gosets_source` table stores
+`5 <= matched_n_genes <= 250`. The companion `kfirst_gosets_source` table stores
 the final source label and matched gene count for every retained pathway.
 
 The KidsFirst default can also load an external already-built GMT when a frozen

@@ -22,6 +22,6 @@ This database was built from the HOPE pathway database after removing
 \verb{KEGG_MEDICUS*} pathways, supplemented with canonical KEGG pathways from
 MSigDB C2 canonical pathways that were not already present. The combined
 database was then filtered to the Kids First interrogated gene universe using
-pathway-size limits of 6 to 249 genes.
+pathway-size limits of 5 to 250 genes.
 }
 \keyword{datasets}
