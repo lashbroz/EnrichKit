@@ -3,25 +3,22 @@
 \docType{data}
 \name{kfirst_gosets_all}
 \alias{kfirst_gosets_all}
-\title{Current Kids First gosets.all Pathway Database}
+\title{Current Kids First Pathway Database}
 \format{
 A named list. Each element is a character vector of gene symbols for
 one pathway/gene set.
 }
 \source{
-HOPE pathway database plus canonical MSigDB C2 KEGG pathways.
+Packaged Kids First pathway database.
 }
 \usage{
 kfirst_gosets_all
 }
 \description{
-The current Kids First \code{gosets.all} pathway database used by EnrichKit.
+The current Kids First pathway database used by EnrichKit.
 }
 \details{
-This database was built from the HOPE pathway database after removing
-\verb{KEGG_MEDICUS*} pathways, supplemented with canonical KEGG pathways from
-MSigDB C2 canonical pathways that were not already present. The combined
-database was then filtered to the Kids First interrogated gene universe using
-pathway-size limits of 5 to 250 genes.
+The packaged database was filtered to the Kids First measured assay
+background using pathway-size limits of 5 to 250 genes.
 }
 \keyword{datasets}

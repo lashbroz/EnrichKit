@@ -1,11 +1,11 @@
-#' Get the Packaged Kids First gosets.all Database
+#' Get the Packaged Kids First Pathway Database
 #'
-#' Loads and optionally filters the packaged Kids First `gosets.all` object.
+#' Loads and optionally filters the packaged [kfirst_gosets_all] object.
 #' This is the easiest way to use the current Kids First pathway database shipped
 #' with EnrichKit.
 #'
-#' @param gene Optional gene universe. If supplied, each pathway is intersected
-#'   with these genes before size filtering.
+#' @param gene Optional measured assay background. If supplied, each pathway is
+#'   intersected with these genes before size filtering.
 #' @param min_genes Minimum retained pathway size.
 #' @param max_genes Maximum retained pathway size.
 #' @param deduplicate If `TRUE`, remove duplicate gene sets after filtering.

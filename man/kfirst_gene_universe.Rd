@@ -3,7 +3,7 @@
 \docType{data}
 \name{kfirst_gene_universe}
 \alias{kfirst_gene_universe}
-\title{Kids First Interrogated Gene Universe}
+\title{Kids First Measured Assay Background}
 \format{
 Character vector of gene symbols.
 }
@@ -11,6 +11,6 @@ Character vector of gene symbols.
 kfirst_gene_universe
 }
 \description{
-Gene universe used to filter \link{kfirst_gosets_all}.
+Measured assay background used to filter \link{kfirst_gosets_all}.
 }
 \keyword{datasets}

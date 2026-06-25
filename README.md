@@ -15,11 +15,11 @@ correction, and clear database provenance.
 **Prepare pathway databases**
 
 - Build gene-set databases from named lists, GMT files, selected MSigDB
-  collections, or the packaged KidsFirst `gosets.all` default.
-- Preserve database/source labels and match every pathway to the interrogated
-  genes for a specific analysis, with an audit trail of retained, trimmed, and
-  dropped sets for cross-referencing analyses performed on different platforms
-  or feature universes.
+  collections, or the packaged Kids First pathway database.
+- Preserve database/source labels and match every pathway to the measured assay
+  background for a specific analysis, with an audit trail of retained, trimmed,
+  and dropped sets for cross-referencing analyses performed on different
+  platforms or feature sets.
 
 **Run enrichment analyses**
 
@@ -85,9 +85,10 @@ exists("sumer", mode = "function")
 library(EnrichKit)
 ```
 
-The examples below use `interrogated_genes` for the measured assay background.
-Define this from the actual analysis matrix before building or matching pathway
-databases.
+The examples below use `interrogated_genes` for the measured assay background:
+the genes or features that were actually measured and eligible for testing in
+the analysis. For a protein matrix, this is usually the protein/gene identifiers
+represented in the matrix rows.
 
 ### MSigDB and KidsFirst Defaults
 
@@ -117,22 +118,23 @@ msigdb_db <- build_msigdb_pathway_db(
 
 ### Kids First Studywide Pathway Database And Generation
 
-EnrichKit ships the current Kids First studywide `gosets.all` database as
-package data. This is the database used for Kids First pathway enrichment unless
-an analysis explicitly supplies a different pathway database.
+EnrichKit ships the current Kids First studywide pathway database as package
+data. This is the database used for Kids First pathway enrichment unless an
+analysis explicitly supplies a different pathway database.
 
 ```r
 data("kfirst_gosets_all")
 data("kfirst_gene_universe")
 
 length(kfirst_gosets_all)
+# Measured assay background used to build the packaged database.
 length(kfirst_gene_universe)
 ```
 
 The packaged object currently contains:
 
 - 9,776 total retained pathways.
-- 12,339 genes in the Kids First/interrogated gene universe.
+- 12,339 genes in the Kids First measured assay background.
 - Inclusive pathway-size filtering of 5 to 250 matched genes for this packaged
   object.
 
@@ -145,7 +147,7 @@ pathway_db <- get_kfirst_gosets(as_pathway_db = TRUE)
 ```
 
 To construct a Kids First studywide database from scratch, start from explicit
-MSigDB GMT files and the measured/interrogated gene universe:
+MSigDB GMT files and the measured assay background:
 
 ```r
 msigdb_db <- build_msigdb_pathway_db(
@@ -181,7 +183,7 @@ pathway_db <- match_pathway_background(
 )
 ```
 
-Background matching intersects each pathway with the Kids First gene universe
+Background matching intersects each pathway with the measured assay background
 and retains pathways with inclusive matched size
 `5 <= matched_n_genes <= 250`.
 
@@ -197,7 +199,7 @@ kfirst_db <- load_kfirst_gosets_gmt(
 ```
 
 For reproducible projects, keep the exact GMT files, MSigDB version labels, and
-the one-column measured gene-universe file with the analysis outputs.
+the one-column measured assay background file with the analysis outputs.
 
 ## Core Enrichment Workflow
 
@@ -256,7 +258,7 @@ pathway_matching_summary(pathway_db)
 
 The default `order_by = "input"` preserves the source database order. Use
 `order_by = "pathway"` for alphabetical order, or `order_by = "database"` to
-group by database label. This is useful when a small interrogated gene universe
+group by database label. This is useful when a small measured assay background
 causes many pathways to collapse onto the same few retained genes.
 
 ## Fisher Enrichment

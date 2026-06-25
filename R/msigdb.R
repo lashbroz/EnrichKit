@@ -210,14 +210,14 @@ build_msigdb_pathway_db <- function(files,
 #' Recreates the current KidsFirst pathway-database convention from explicit
 #' source files: use `pathway_database_HOPE.gmt` with `KEGG_MEDICUS*` pathways
 #' removed, add canonical MSigDB C2 CP KEGG pathways from an explicit GMT file
-#' that are not already present, and filter to the provided KidsFirst/measured
-#' gene universe.
+#' that are not already present, and filter to the provided KidsFirst measured
+#' assay background.
 #'
 #' @param hope_gmt HOPE pathway database GMT, typically
 #'   `pathway_database_HOPE.gmt`.
 #' @param canonical_kegg_gmt Canonical MSigDB C2 CP KEGG GMT, for example
 #'   `c2.cp.kegg.v7.0.symbols.gmt`.
-#' @param universe Measured gene universe used for filtering.
+#' @param universe Measured assay background used for filtering.
 #' @param min_size Minimum retained set size. Defaults to KidsFirst usage, 5.
 #' @param max_size Maximum retained set size. Defaults to KidsFirst usage, 250.
 #'
@@ -258,7 +258,7 @@ build_kfirst_default_pathway_db <- function(hope_gmt,
 #'
 #' @param file Existing KidsFirst GMT file.
 #' @param source_table Optional source table with pathway/source columns.
-#' @param universe Optional interrogated gene universe.
+#' @param universe Optional measured assay background.
 #' @param min_size Minimum retained set size.
 #' @param max_size Maximum retained set size.
 #'
@@ -358,16 +358,15 @@ kfirst_source_description <- function(source) {
   out
 }
 
-#' KidsFirst gosets.all Provenance
+#' KidsFirst Pathway Database Provenance
 #'
-#' Returns a short provenance record for the current KidsFirst `gosets.all`
-#' pathway database convention. This is intended for README text, methods
-#' sections, and audit trails.
+#' Returns a short provenance record for the current KidsFirst pathway database
+#' convention. This is intended for methods sections and audit trails.
 #'
 #' The current convention combines the HOPE pathway database after removing
 #' `KEGG_MEDICUS*` pathways with canonical KEGG pathways from MSigDB C2 canonical
 #' pathways that were not already present. The combined database is then matched
-#' to the KidsFirst/interrogated gene universe using the requested pathway-size
+#' to the KidsFirst measured assay background using the requested pathway-size
 #' limits.
 #'
 #' @param source_table Optional KidsFirst source TSV with `pathway`, `source`,
@@ -400,11 +399,11 @@ kfirst_gosets_provenance <- function(source_table = NULL,
   }
 
   text <- paste0(
-    "`gosets.all` was constructed from the HOPE pathway database after removing ",
+    "`kfirst_gosets_all` was constructed from the HOPE pathway database after removing ",
     "`KEGG_MEDICUS*` pathways, supplemented with canonical KEGG pathways from ",
     "MSigDB C2 canonical pathways that were not already present. The combined ",
-    "pathway database was then filtered to the KidsFirst/interrogated gene ",
-    "universe using pathway-size limits of ", min_size, " to ", max_size,
+    "pathway database was then filtered to the KidsFirst measured assay ",
+    "background using pathway-size limits of ", min_size, " to ", max_size,
     " genes.", count_text
   )
 

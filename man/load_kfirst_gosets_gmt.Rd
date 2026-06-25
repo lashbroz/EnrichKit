@@ -17,7 +17,7 @@ load_kfirst_gosets_gmt(
 
 \item{source_table}{Optional source table with pathway/source columns.}
 
-\item{universe}{Optional interrogated gene universe.}
+\item{universe}{Optional measured assay background.}
 
 \item{min_size}{Minimum retained set size.}
 

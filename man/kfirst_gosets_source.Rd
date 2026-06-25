@@ -3,7 +3,7 @@
 \docType{data}
 \name{kfirst_gosets_source}
 \alias{kfirst_gosets_source}
-\title{Kids First gosets.all Source Table}
+\title{Kids First Pathway Source Table}
 \format{
 A data frame with columns:
 \describe{

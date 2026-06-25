@@ -2,7 +2,7 @@
 % Please edit documentation in R/kfirst_data.R
 \name{get_kfirst_gosets}
 \alias{get_kfirst_gosets}
-\title{Get the Packaged Kids First gosets.all Database}
+\title{Get the Packaged Kids First Pathway Database}
 \usage{
 get_kfirst_gosets(
   gene = NULL,
@@ -13,8 +13,8 @@ get_kfirst_gosets(
 )
 }
 \arguments{
-\item{gene}{Optional gene universe. If supplied, each pathway is intersected
-with these genes before size filtering.}
+\item{gene}{Optional measured assay background. If supplied, each pathway is
+intersected with these genes before size filtering.}
 
 \item{min_genes}{Minimum retained pathway size.}
 
@@ -29,7 +29,7 @@ source labels from \code{kfirst_gosets_source}. If \code{FALSE}, return a named 
 A named list of gene sets or an \code{EnrichKit_pathway_db} object.
 }
 \description{
-Loads and optionally filters the packaged Kids First \code{gosets.all} object.
+Loads and optionally filters the packaged \link{kfirst_gosets_all} object.
 This is the easiest way to use the current Kids First pathway database shipped
 with EnrichKit.
 }

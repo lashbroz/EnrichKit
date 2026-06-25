@@ -2,7 +2,7 @@
 % Please edit documentation in R/msigdb.R
 \name{kfirst_gosets_provenance}
 \alias{kfirst_gosets_provenance}
-\title{KidsFirst gosets.all Provenance}
+\title{KidsFirst Pathway Database Provenance}
 \usage{
 kfirst_gosets_provenance(source_table = NULL, min_size = 5, max_size = 250)
 }
@@ -19,14 +19,13 @@ read from this table.}
 A list with \code{text}, \code{components}, \code{filters}, and \code{method_note}.
 }
 \description{
-Returns a short provenance record for the current KidsFirst \code{gosets.all}
-pathway database convention. This is intended for README text, methods
-sections, and audit trails.
+Returns a short provenance record for the current KidsFirst pathway database
+convention. This is intended for methods sections and audit trails.
 }
 \details{
 The current convention combines the HOPE pathway database after removing
 \verb{KEGG_MEDICUS*} pathways with canonical KEGG pathways from MSigDB C2 canonical
 pathways that were not already present. The combined database is then matched
-to the KidsFirst/interrogated gene universe using the requested pathway-size
+to the KidsFirst measured assay background using the requested pathway-size
 limits.
 }

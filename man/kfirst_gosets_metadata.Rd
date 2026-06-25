@@ -3,10 +3,10 @@
 \docType{data}
 \name{kfirst_gosets_metadata}
 \alias{kfirst_gosets_metadata}
-\title{Kids First gosets.all Metadata}
+\title{Kids First Pathway Metadata}
 \format{
 A list with source labels, pathway-size filters, pathway counts, and
-the size of the Kids First gene universe.
+the size of the Kids First measured assay background.
 }
 \usage{
 kfirst_gosets_metadata

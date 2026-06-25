@@ -19,7 +19,7 @@ build_kfirst_default_pathway_db(
 \item{canonical_kegg_gmt}{Canonical MSigDB C2 CP KEGG GMT, for example
 \code{c2.cp.kegg.v7.0.symbols.gmt}.}
 
-\item{universe}{Measured gene universe used for filtering.}
+\item{universe}{Measured assay background used for filtering.}
 
 \item{min_size}{Minimum retained set size. Defaults to KidsFirst usage, 5.}
 
@@ -32,6 +32,6 @@ An \code{EnrichKit_pathway_db} object.
 Recreates the current KidsFirst pathway-database convention from explicit
 source files: use \code{pathway_database_HOPE.gmt} with \verb{KEGG_MEDICUS*} pathways
 removed, add canonical MSigDB C2 CP KEGG pathways from an explicit GMT file
-that are not already present, and filter to the provided KidsFirst/measured
-gene universe.
+that are not already present, and filter to the provided KidsFirst measured
+assay background.
 }
